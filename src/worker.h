@@ -43,7 +43,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 				std::ifstream source_file(file_path);
 				if (!source_file.is_open()) {
 					std::cerr << "Error when opening file: " << file_path << std::endl;
-					return new grpc::Status(grpc::Status::INTERNAL,
+					return new grpc::Status(grpc::StatusCode::INTERNAL,
 						"Error when opening file: " + file_path);
 				}
 
@@ -63,7 +63,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
-				return new grpc::Status(grpc::Status::INTERNAL,
+				return new grpc::Status(grpc::StatusCode::INTERNAL,
 					"Error when opening an output file for map function: " + output_filepath);
 			}
 
@@ -89,7 +89,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 					std::string key, val;
 					if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
 						std::cerr << "Error when processing intermediate file in reduce function: " << region->file_paths(i) << std::endl;
-						return new grpc::Status(grpc::Status::INTERNAL,
+						return new grpc::Status(grpc::StatusCode::INTERNAL,
 							"Error when processing intermediate file in reduce function: " + region->file_paths(i));
 					}
 
@@ -108,7 +108,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
-				return new grpc::Status(grpc::Status::INTERNAL,
+				return new grpc::Status(grpc::StatusCode::INTERNAL,
 					"Error when opening an output file for reduce function: " + output_filepath);
 			}
 
