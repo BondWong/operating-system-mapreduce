@@ -49,7 +49,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 				line_cnt = 0;
 				cur_size = 0;
 				fileshard_id++;
-				*cur_shard = new FileShard;
+				cur_shard = new FileShard;
 			}
 
 			cur_size += line.length();
