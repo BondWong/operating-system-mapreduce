@@ -27,8 +27,94 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 		int map_number;
 		std::string ip_addr_port;
-		grpc::Status map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::rResult* res);
-		grpc::Status reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res);
+
+		grpc::Status map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
+			auto mapper = get_mapper_from_task_factory("cs6210");
+
+			for (int i = 0; i < shard->components_size(); i++) {
+				const ShardComponent& comp = shard->components(i);
+				const std::string& file_path = comp.file_path();
+				int start = comp.start();
+				int size = comp.size();
+
+				std::ifstream source_file(file_path);
+				if (!source_file.is_open()) {
+					std::cerr << "Error when opening file: " << file_path << std::endl;
+					return new grpc::Status(500, "Error when opening file: " + file_path);
+				}
+
+				std::string line;
+				// loop to the starting line
+				for (int j = 0; j < start; j++) std::getline(source_file, line);
+				for (int j = start; j < size; j++) {
+					std::getline(source_file, line);
+					mapper->map(line);
+				}
+			}
+
+			std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
+			sort(key_vals.begin(), key_vals.end());
+
+			std::string output_filepath("Worker_" + ip_addr_port + "_" + ++map_number);
+			std::ofstream output_file(output_filepath);
+			if (!output_file.is_open()) {
+				std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
+				return new grpc::Status(500, "Error when opening an output file for map function: " + output_filepath);
+			}
+
+			std::vector<std::pair<std::string, std::string> >::iterator it;
+			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
+
+			res->set_worker_ip_addr_port(ip_addr_port);
+			res->set_file_path(output_filepath);
+			return grpc::Status::OK;
+		}
+
+		grpc::Status reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
+			auto reducer = get_reducer_from_task_factory("cs6210");
+
+			for (int i = 0; i < region->file_paths_size(); i++) {
+				std::ifstream source_file(region->file_paths(i));
+				std::string line;
+				std::vector<std::string> vals;
+				std::string prev_key;
+
+				while (std::getline(source_file, line)) {
+					std::istringstream iss(line);
+					std::string key, val;
+					if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
+						std::cerr << "Error when processing intermediate file in reduce function: " << region->file_paths(i) << std::endl;
+						return new grpc::Status(500, "Error when processing intermediate file in reduce function: " + region->file_paths(i));
+					}
+
+					if (prev_key.compare("") != 0 && prev_key.compare(key) != 0) {
+						reducer->reduce(prev_key, vals);
+						vals.clear();
+					}
+
+					vals.push_back(val);
+					prev_key = key;
+				}
+			}
+
+			// done with region, write to file
+			std::string output_filepath("./output/output_" + ip_addr_port);
+			std::ofstream output_file(output_filepath);
+			if (!output_file.is_open()) {
+				std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
+				return new grpc::Status(500, "Error when opening an output file for reduce function: " + output_filepath);
+			}
+
+			std::vector<std::pair<std::string, std::string> >& key_vals = reducer->impl_->pairs;
+			std::vector<std::pair<std::string, std::string> >::iterator it;
+			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << "=" << it->second << std::endl;
+			output_file.close();
+
+			res->set_worker_ip_addr_port(ip_addr_port);
+			res->set_file_path(output_filepath);
+
+			return grpc::Status::OK;
+		}
 };
 
 
@@ -55,92 +141,4 @@ bool Worker::run() {
 	auto reducer = get_reducer_from_task_factory("cs6210");
 	reducer->reduce("dummy", std::vector<std::string>({"1", "1"}));
 	return true;
-}
-
-grpc::Status Worker::map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
-	auto mapper = get_mapper_from_task_factory("cs6210");
-
-	for (int i = 0; i < shard->components_size(); i++) {
-		const ShardComponent& comp = shard->components(i);
-		const std::string& file_path = comp.file_path();
-		int start = comp.start();
-		int size = comp.size();
-
-		std::ifstream source_file(file_path);
-		if (!source_file.is_open()) {
-			std::cerr << "Error when opening file: " << file_path << std::endl;
-			return new grpc::Status(500, "Error when opening file: " + file_path);
-		}
-
-		std::string line;
-		// loop to the starting line
-		for (int j = 0; j < start; j++) std::getline(source_file, line);
-		for (int j = start; j < size; j++) {
-			std::getline(source_file, line);
-			mapper->map(line);
-		}
-	}
-
-	std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
-	sort(key_vals.begin(), key_vals.end());
-
-	std::string output_filepath("Worker_" + ip_addr_port + "_" + ++map_number);
-	std::ofstream output_file(output_filepath);
-	if (!output_file.is_open()) {
-		std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
-		return new grpc::Status(500, "Error when opening an output file for map function: " + output_filepath);
-	}
-
-	std::vector<std::pair<std::string, std::string> >::iterator it;
-	for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
-
-	res->set_worker_ip_addr_port(ip_addr_port);
-	res->set_file_path(output_filepath);
-	return grpc::Status::OK;
-}
-
-grpc::Status Worker::reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
-	auto reducer = get_reducer_from_task_factory("cs6210");
-
-	for (int i = 0; i < region->file_paths_size(); i++) {
-		std::ifstream source_file(region->file_paths(i));
-		std::string line;
-		std::vector<std::string> vals;
-		std::string prev_key;
-
-		while (std::getline(source_file, line)) {
-			std::istringstream iss(line);
-			std::string key, val;
-			if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
-				std::cerr << "Error when processing intermediate file in reduce function: " << region->file_paths(i) << std::endl;
-				return new grpc::Status(500, "Error when processing intermediate file in reduce function: " + region->file_paths(i));
-			}
-
-			if (prev_key.compare("") != 0 && prev_key.compare(key) != 0) {
-				reducer->reduce(prev_key, vals);
-				vals.clear();
-			}
-
-			vals.push_back(val);
-			prev_key = key;
-		}
-	}
-
-	// done with region, write to file
-	std::string output_filepath("./output/output_" + ip_addr_port);
-	std::ofstream output_file(output_filepath);
-	if (!output_file.is_open()) {
-		std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
-		return new grpc::Status(500, "Error when opening an output file for reduce function: " + output_filepath);
-	}
-
-	std::vector<std::pair<std::string, std::string> >& key_vals = reducer->impl_->pairs;
-	std::vector<std::pair<std::string, std::string> >::iterator it;
-	for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << "=" << it->second << std::endl;
-	output_file.close();
-
-	res->set_worker_ip_addr_port(ip_addr_port);
-	res->set_file_path(output_filepath);
-
-	return grpc::Status::OK;
 }
