@@ -43,7 +43,8 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 				std::ifstream source_file(file_path);
 				if (!source_file.is_open()) {
 					std::cerr << "Error when opening file: " << file_path << std::endl;
-					return new grpc::Status(500, "Error when opening file: " + file_path);
+					return new grpc::Status(grpc::Status::INTERNAL,
+						"Error when opening file: " + file_path);
 				}
 
 				std::string line;
@@ -62,7 +63,8 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
-				return new grpc::Status(500, "Error when opening an output file for map function: " + output_filepath);
+				return new grpc::Status(grpc::Status::INTERNAL,
+					"Error when opening an output file for map function: " + output_filepath);
 			}
 
 			std::vector<std::pair<std::string, std::string> >::iterator it;
@@ -87,7 +89,8 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 					std::string key, val;
 					if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
 						std::cerr << "Error when processing intermediate file in reduce function: " << region->file_paths(i) << std::endl;
-						return new grpc::Status(500, "Error when processing intermediate file in reduce function: " + region->file_paths(i));
+						return new grpc::Status(grpc::Status::INTERNAL,
+							"Error when processing intermediate file in reduce function: " + region->file_paths(i));
 					}
 
 					if (prev_key.compare("") != 0 && prev_key.compare(key) != 0) {
@@ -105,7 +108,8 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
-				return new grpc::Status(500, "Error when opening an output file for reduce function: " + output_filepath);
+				return new grpc::Status(grpc::Status::INTERNAL,
+					"Error when opening an output file for reduce function: " + output_filepath);
 			}
 
 			std::vector<std::pair<std::string, std::string> >& key_vals = reducer->impl_->pairs;
