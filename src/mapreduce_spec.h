@@ -18,27 +18,26 @@ struct MapReduceSpec {
 };
 
 inline bool fill_marspec(MapReduceSpec& mr_spec, const std::string& key, const std::string& val) {
-		if ("user_id".compare(key) == 0) {
-			mr_spec.user_id = val;
-		} else if ("n_workers".compare(key) == 0) {
-			mr_spec.n_workers = val;
-		} else if ("worker_ipaddr_ports".compare(key) == 0) {
-			std::istringstream iss(val);
-			std::string file_path;
-			while (std::getline(iss, file_path, ',')) mr_spec.worker_ipaddr_ports.push_back(addr);
-		} else if ("input_files".compare(key) == 0) {
-			std::istringstream iss(val);
-			std::string file_path;
-			while (std::getline(iss, file_path, ',')) mr_spec.input_files.push_back(addr);
-		} else if ("map_kilobytes".compare(key) == 0) {
-			mr_spec.map_kilobytes = std::stoi(val);
-		} else if ("n_output_files".compare(key) == 0) {
-			mr_spec.map_kilobytes = std::stoi(val);
-		} else if ("output_dir".compare(key) == 0) {
-			mr_spec.output_dir = val;
-		} else {
-			return false;
-		}
+	if (key.compare("user_id") == 0) {
+		mr_spec.user_id = val;
+	} else if (key.compare("n_workers") == 0) {
+		mr_spec.n_workers = val;
+	} else if (key.compare("worker_ipaddr_ports") == 0) {
+		std::istringstream iss(val);
+		std::string file_path;
+		while (std::getline(iss, file_path, ',')) mr_spec.worker_ipaddr_ports.push_back(addr);
+	} else if (key.compare("input_files") == 0) {
+		std::istringstream iss(val);
+		std::string file_path;
+		while (std::getline(iss, file_path, ',')) mr_spec.input_files.push_back(addr);
+	} else if (key.compare("map_kilobytes") == 0) {
+		mr_spec.map_kilobytes = std::stoi(val);
+	} else if (key.compare("n_output_files") == 0) {
+		mr_spec.map_kilobytes = std::stoi(val);
+	} else if (key.compare("output_dir") == 0) {
+		mr_spec.output_dir = val;
+	} else {
+		return false;
 	}
 
 	return true;
