@@ -21,15 +21,15 @@ inline bool fill_marspec(MapReduceSpec& mr_spec, const std::string& key, const s
 	if (key.compare("user_id") == 0) {
 		mr_spec.user_id = val;
 	} else if (key.compare("n_workers") == 0) {
-		mr_spec.n_workers = val;
+		mr_spec.n_workers = std::stoi(val);
 	} else if (key.compare("worker_ipaddr_ports") == 0) {
 		std::istringstream iss(val);
 		std::string file_path;
-		while (std::getline(iss, file_path, ',')) mr_spec.worker_ipaddr_ports.push_back(addr);
+		while (std::getline(iss, file_path, ',')) mr_spec.worker_ipaddr_ports.push_back(file_path);
 	} else if (key.compare("input_files") == 0) {
 		std::istringstream iss(val);
 		std::string file_path;
-		while (std::getline(iss, file_path, ',')) mr_spec.input_files.push_back(addr);
+		while (std::getline(iss, file_path, ',')) mr_spec.input_files.push_back(file_path);
 	} else if (key.compare("map_kilobytes") == 0) {
 		mr_spec.map_kilobytes = std::stoi(val);
 	} else if (key.compare("n_output_files") == 0) {
