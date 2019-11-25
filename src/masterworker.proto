@@ -14,9 +14,16 @@ message Shard {
   int32 size = 4;
 }
 
+message Region {
+  int32 id = 1;
+  int32 cnt = 2;
+  repeated string file_paths = 3;
+}
+
 message MapResult {
   string worker_id = 1; // worker address as id
-  repeated string file_paths = 2;
+  int32 cnt = 2;
+  repeated string file_paths = 3;
 }
 
 message ReduceResult {
