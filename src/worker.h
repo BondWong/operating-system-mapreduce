@@ -8,7 +8,7 @@
 
 /* CS6210_TASK: Handle all the task a Worker is supposed to do.
 	This is a big task for this project, will test your understanding of map reduce */
-class Worker final: public WorkerService:Service {
+class Worker: public WorkerService::Service {
 
 	public:
 		/* DON'T change the function signature of this constructor */

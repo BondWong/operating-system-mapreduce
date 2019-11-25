@@ -3,8 +3,8 @@ syntax = "proto3";
 package masterworker;
 
 service WorkerService {
-  rpc map(Shard) returns (MapResult) {}
-  rpc reduce(Region) returns (ReduceResult) {}
+  rpc map(Shard) returns (Result) {}
+  rpc reduce(Region) returns (Result) {}
 }
 
 message ShardComponent {
@@ -23,12 +23,7 @@ message Region {
   repeated string file_paths = 2;
 }
 
-message MapResult {
-  string worker_ip_addr_port = 1; // worker address as id
-  repeated string file_path = 2;
-}
-
-message ReduceResult {
+message Result {
   string worker_ip_addr_port = 1; // worker address as id
   string file_path = 2;
 }
