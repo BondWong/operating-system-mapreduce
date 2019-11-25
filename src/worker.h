@@ -55,7 +55,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 			std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
 			sort(key_vals.begin(), key_vals.end());
 
-			std::string output_filepath("Worker_" + ip_addr_port + "_" + ++map_number);
+			std::string output_filepath("Worker_" + ip_addr_port + "_" + std::to_string(++map_number));
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;

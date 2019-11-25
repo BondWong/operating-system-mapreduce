@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <fstream>
-#include <math.h>
 #include "mapreduce_spec.h"
 
 /* CS6210_TASK: Create your own data structure here, where you can hold information about file splits,
