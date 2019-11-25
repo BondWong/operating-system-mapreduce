@@ -7,26 +7,28 @@ service WorkerService {
   rpc reduce(Region) returns (ReduceResult) {}
 }
 
+message ShardComponent {
+  string file_path = 1;
+  int32 start = 2;
+  int32 size = 3;
+}
+
 message Shard {
   int32 id = 1;
-  string file_path = 2;
-  int32 start = 3;
-  int32 size = 4;
+  repeated ShardComponent components = 2;
 }
 
 message Region {
   int32 id = 1;
-  int32 cnt = 2;
-  repeated string file_paths = 3;
+  repeated string file_paths = 2;
 }
 
 message MapResult {
-  string worker_id = 1; // worker address as id
-  int32 cnt = 2;
-  repeated string file_paths = 3;
+  string worker_ip_addr_port = 1; // worker address as id
+  repeated string file_path = 2;
 }
 
 message ReduceResult {
-  string worker_id = 1; // worker address as id
-  string filename = 2;
+  string worker_ip_addr_port = 1; // worker address as id
+  string file_path = 2;
 }
