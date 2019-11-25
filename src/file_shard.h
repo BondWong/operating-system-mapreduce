@@ -23,11 +23,11 @@ struct FileShard {
 inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fileShards) {
 	int shard_size = mr_spec.map_kilobytes * 1024;
 	int fileshard_id = 0;
-	FileShard *cur_shard = new FileShard;
+	FileShard* cur_shard = new FileShard;
 	cur_shard->id = fileshard_id;
 	int cur_size = 0;
 
-	vector<std::string>::iterator it = mr_spec.input_files.begin();
+	std::vector<std::string>::const_iterator it = mr_spec.input_files.begin();
 	while (it != mr_spec.input_files.end()) {
 		int start_line = 0;
 		int line_cnt = 0;
