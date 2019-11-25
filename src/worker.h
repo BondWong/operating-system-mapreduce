@@ -7,7 +7,6 @@
 #include <grpc/support/log.h>
 
 #include <mr_task_factory.h>
-#include "file_shard.h"
 #include "mr_tasks.h"
 #include "masterworker.grpc.pb.h"
 
@@ -36,7 +35,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 			auto mapper = get_mapper_from_task_factory("cs6210");
 
 			for (int i = 0; i < shard->components_size(); i++) {
-				const ShardComponent& comp = shard->components(i);
+				const masterworker::ShardComponent& comp = shard->components(i);
 				const std::string& file_path = comp.file_path();
 				int start = comp.start();
 				int size = comp.size();
