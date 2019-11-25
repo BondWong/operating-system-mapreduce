@@ -27,7 +27,7 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 		int map_number;
 		std::string ip_addr_port;
-		grpc::Status map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworke::rResult* res);
+		grpc::Status map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::rResult* res);
 		grpc::Status reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res);
 };
 
