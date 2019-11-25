@@ -18,34 +18,27 @@ struct MapReduceSpec {
 };
 
 inline bool fill_marspec(MapReduceSpec& mr_spec, const std::string& key, const std::string& val) {
-	switch(key) {
-		case "user_id":
+		if ("user_id".compare(key) == 0) {
 			mr_spec.user_id = val;
-			break;
-		case "n_workers":
+		} else if ("n_workers".compare(key) == 0) {
 			mr_spec.n_workers = val;
-			break;
-		case "worker_ipaddr_ports":
+		} else if ("worker_ipaddr_ports".compare(key) == 0) {
 			std::istringstream iss(val);
 			std::string file_path;
 			while (std::getline(iss, file_path, ',')) mr_spec.worker_ipaddr_ports.push_back(addr);
-			break;
-		case "input_files":
+		} else if ("input_files".compare(key) == 0) {
 			std::istringstream iss(val);
 			std::string file_path;
 			while (std::getline(iss, file_path, ',')) mr_spec.input_files.push_back(addr);
-			break;
-		case "map_kilobytes":
+		} else if ("map_kilobytes".compare(key) == 0) {
 			mr_spec.map_kilobytes = std::stoi(val);
-			break;
-		case "n_output_files":
+		} else if ("n_output_files".compare(key) == 0) {
 			mr_spec.map_kilobytes = std::stoi(val);
-			break;
-		case "output_dir":
+		} else if ("output_dir".compare(key) == 0) {
 			mr_spec.output_dir = val;
-			break;
-		default:
+		} else {
 			return false;
+		}
 	}
 
 	return true;
@@ -66,7 +59,7 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 		std::string key;
 		std::string value;
 		bool isOk = std::getline(line_stream, key, '=')
-			&& std::getline(is_line, value);
+			&& std::getline(line_stream, value);
 
 
 		if (!isOk) {
