@@ -10,6 +10,9 @@
 #include "mr_tasks.h"
 #include "masterworker.grpc.pb.h"
 
+extern std::shared_ptr<BaseMapper> get_mapper_from_task_factory(const std::string& user_id);
+extern std::shared_ptr<BaseReducer> get_reducer_from_task_factory(const std::string& user_id);
+
 /* CS6210_TASK: Handle all the task a Worker is supposed to do.
 	This is a big task for this project, will test your understanding of map reduce */
 
@@ -123,9 +126,6 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 Worker::Worker(std::string ip_addr_port): ip_addr_port(ip_addr_port) {
 	map_number = 0;
 }
-
-extern std::shared_ptr<BaseMapper> get_mapper_from_task_factory(const std::string& user_id);
-extern std::shared_ptr<BaseReducer> get_reducer_from_task_factory(const std::string& user_id);
 
 /* CS6210_TASK: Here you go. once this function is called your woker's job is to keep looking for new tasks
 	from Master, complete when given one and again keep looking for the next one.
