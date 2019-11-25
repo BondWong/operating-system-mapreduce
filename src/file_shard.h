@@ -1,17 +1,71 @@
 #pragma once
 
 #include <vector>
+#include <fstream>
+#include <math.h>
 #include "mapreduce_spec.h"
-
 
 /* CS6210_TASK: Create your own data structure here, where you can hold information about file splits,
      that your master would use for its own bookkeeping and to convey the tasks to the workers for mapping */
-struct FileShard {
 
+struct ShardComponent {
+	std::string file_path;
+	std::streampos start;
+	int size;
 };
 
+struct FileShard {
+	int id;
+	std::vector<ShardComponent> components;
+};
 
-/* CS6210_TASK: Create fileshards from the list of input files, map_kilobytes etc. using mr_spec you populated  */ 
+/* CS6210_TASK: Create fileshards from the list of input files, map_kilobytes etc. using mr_spec you populated  */
 inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fileShards) {
+	int shard_size = mr_spec.map_kilobytes * 1024;
+	int fileshard_id = 0;
+	FileShard *cur_shard = new FileShard;
+	cur_shard->id = fileshard_id;
+	int cur_size = 0;
+
+	vector<std::string>::iterator it = mr_spec.input_files.begin();
+	while (it != mr_spec.input_files.end()) {
+		int start_line = 0;
+		int line_cnt = 0;
+
+		std::ifstream infile(*it);
+		std::string line;
+		while (std::getline(infile, line)) {
+			// find one component
+			if (cur_size + line.length() > shard_size) {
+				ShardComponent* component;
+				component->file_path = *it;
+				component->start = start_line;
+				component->size = line_cnt;
+				cur_shard->components.push_back(*component);
+				fileShards.push_back(*cur_shard);
+
+				// clear for next component
+				start_line = line_cnt;
+				line_cnt = 0;
+				cur_size = 0;
+				fileshard_id++;
+				*cur_shard = new FileShard;
+			}
+
+			cur_size += line.length();
+			line_cnt++;
+		}
+
+		// handle remaining
+		ShardComponent* component;
+		component->file_path = *it;
+		component->start = start_line;
+		component->size = line_cnt;
+		cur_shard->components.push_back(*component);
+
+		// handle next file
+		it++;
+	}
+
 	return true;
 }
