@@ -1,3 +1,25 @@
 syntax = "proto3";
 
 package masterworker;
+
+service WorkerService {
+  rpc map(Shard) returns (MapResult) {}
+  rpc reduce(Region) returns (ReduceResult) {}
+}
+
+message Shard {
+  int32 id = 1;
+  string file_path = 2;
+  int32 start = 3;
+  int32 size = 4;
+}
+
+message MapResult {
+  string worker_id = 1; // worker address as id
+  repeated string file_paths = 2;
+}
+
+message ReduceResult {
+  string worker_id = 1; // worker address as id
+  string filename = 2;
+}
