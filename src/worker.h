@@ -1,14 +1,20 @@
 #pragma once
 
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <grpcpp/grpcpp.h>
+#include <grpc/support/log.h>
 
 #include <mr_task_factory.h>
 #include "mr_tasks.h"
-
+#include "masterworker.grpc.pb.h"
 
 /* CS6210_TASK: Handle all the task a Worker is supposed to do.
 	This is a big task for this project, will test your understanding of map reduce */
-class Worker: public WorkerService::Service {
+
+// the idea of creating a service is based on this link https://grpc.io/docs/tutorials/basic/cpp/
+class Worker final: public masterworker::MapReduceWorkerService::Service {
 
 	public:
 		/* DON'T change the function signature of this constructor */
@@ -21,8 +27,8 @@ class Worker: public WorkerService::Service {
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 		int map_number;
 		std::string ip_addr_port;
-		Status map(ServerContext* ctx, const Shard* shard, MapResult* res);
-		Status reduce(ServerContext* ctx, const Region* region, ReduceResult* res);
+		grpc::Status map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworke::rResult* res);
+		grpc::Status reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res);
 };
 
 
@@ -51,7 +57,7 @@ bool Worker::run() {
 	return true;
 }
 
-Status Worker::map(ServerContext* ctx, const Shard* shard, MapResult* res) override {
+grpc::Status Worker::map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
 	auto mapper = get_mapper_from_task_factory("cs6210");
 
 	for (int i = 0; i < shard->components_size(); i++) {
@@ -63,7 +69,7 @@ Status Worker::map(ServerContext* ctx, const Shard* shard, MapResult* res) overr
 		std::ifstream source_file(file_path);
 		if (!source_file.is_open()) {
 			std::cerr << "Error when opening file: " << file_path << std::endl;
-			return new Status(500, "Error when opening file: " + file_path);
+			return new grpc::Status(500, "Error when opening file: " + file_path);
 		}
 
 		std::string line;
@@ -82,7 +88,7 @@ Status Worker::map(ServerContext* ctx, const Shard* shard, MapResult* res) overr
 	std::ofstream output_file(output_filepath);
 	if (!output_file.is_open()) {
 		std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
-		return new Status(500, "Error when opening an output file for map function: " + output_filepath);
+		return new grpc::Status(500, "Error when opening an output file for map function: " + output_filepath);
 	}
 
 	std::vector<std::pair<std::string, std::string> >::iterator it;
@@ -90,10 +96,10 @@ Status Worker::map(ServerContext* ctx, const Shard* shard, MapResult* res) overr
 
 	res->set_worker_ip_addr_port(ip_addr_port);
 	res->set_file_path(output_filepath);
-	return Status::OK;
+	return grpc::Status::OK;
 }
 
-Status Worker::reduce(ServerContext* ctx, const Region* region, ReduceResult* res) override {
+grpc::Status Worker::reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
 	auto reducer = get_reducer_from_task_factory("cs6210");
 
 	for (int i = 0; i < region->file_paths_size(); i++) {
@@ -107,7 +113,7 @@ Status Worker::reduce(ServerContext* ctx, const Region* region, ReduceResult* re
 			std::string key, val;
 			if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
 				std::cerr << "Error when processing intermediate file in reduce function: " << region->file_paths(i) << std::endl;
-				return new Status(500, "Error when processing intermediate file in reduce function: " + region->file_paths(i));
+				return new grpc::Status(500, "Error when processing intermediate file in reduce function: " + region->file_paths(i));
 			}
 
 			if (prev_key.compare("") != 0 && prev_key.compare(key) != 0) {
@@ -125,7 +131,7 @@ Status Worker::reduce(ServerContext* ctx, const Region* region, ReduceResult* re
 	std::ofstream output_file(output_filepath);
 	if (!output_file.is_open()) {
 		std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
-		return new Status(500, "Error when opening an output file for reduce function: " + output_filepath);
+		return new grpc::Status(500, "Error when opening an output file for reduce function: " + output_filepath);
 	}
 
 	std::vector<std::pair<std::string, std::string> >& key_vals = reducer->impl_->pairs;
@@ -136,5 +142,5 @@ Status Worker::reduce(ServerContext* ctx, const Region* region, ReduceResult* re
 	res->set_worker_ip_addr_port(ip_addr_port);
 	res->set_file_path(output_filepath);
 
-	return Status::OK;
+	return grpc::Status::OK;
 }
