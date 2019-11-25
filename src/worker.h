@@ -7,6 +7,7 @@
 #include <grpc/support/log.h>
 
 #include <mr_task_factory.h>
+#include "file_shard.h"
 #include "mr_tasks.h"
 #include "masterworker.grpc.pb.h"
 

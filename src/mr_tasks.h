@@ -15,7 +15,7 @@ struct BaseMapperInternal {
 		void emit(const std::string& key, const std::string& val);
 
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
-		std::vector<std::pair<std::string, std::string> > paris;
+		std::vector<std::pair<std::string, std::string> > pairs;
 };
 
 
@@ -27,7 +27,7 @@ inline BaseMapperInternal::BaseMapperInternal() {
 
 /* CS6210_TASK Implement this function */
 inline void BaseMapperInternal::emit(const std::string& key, const std::string& val) {
-	paris.push_back(std::make_pair(key, val));
+	pairs.push_back(std::make_pair(key, val));
 }
 
 
@@ -45,7 +45,7 @@ struct BaseReducerInternal {
 		void emit(const std::string& key, const std::string& val);
 
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
-		std::vector<std::pair<std::string, std::string> > paris;
+		std::vector<std::pair<std::string, std::string> > pairs;
 };
 
 
@@ -57,5 +57,5 @@ inline BaseReducerInternal::BaseReducerInternal() {
 
 /* CS6210_TASK Implement this function */
 inline void BaseReducerInternal::emit(const std::string& key, const std::string& val) {
-	paris.push_back(std::make_pair(key, val));
+	pairs.push_back(std::make_pair(key, val));
 }
