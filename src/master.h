@@ -176,18 +176,18 @@ bool Master::run() {
 			}
 		}
 
-		if (cur_size > 0) {
-			std::cout << "Found a shard of size: " << cur_size << std::endl;
-			masterworker::Shard region;
-			region.set_id(region_id);
-			masterworker::ShardComponent *component = region.add_components();
-			component->set_file_path(mapRes_it->file_path());
-			component->set_start(start_line);
-			component->set_size(cur_size);
-
-			region_id++;
-			executeReduce(region);
-		}
+		// if (cur_size > 0) {
+		// 	std::cout << "Found a shard of size: " << cur_size << std::endl;
+		// 	masterworker::Shard region;
+		// 	region.set_id(region_id);
+		// 	masterworker::ShardComponent *component = region.add_components();
+		// 	component->set_file_path(mapRes_it->file_path());
+		// 	component->set_start(start_line);
+		// 	component->set_size(cur_size);
+		//
+		// 	region_id++;
+		// 	executeReduce(region);
+		// }
 
 		// clear for next file
 		start_line = 0;
