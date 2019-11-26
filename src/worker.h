@@ -100,8 +100,8 @@ class Worker final: public masterworker::WorkerService::Service {
 
 				// loop to the starting line
 				for (int j = 0; j < start; j++) std::getline(source_file, line);
-
-				while (std::getline(source_file, line)) {
+				for (int j = start; j < size; j++) {
+					std::getline(source_file, line);
 					std::istringstream iss(line);
 					std::string key, val;
 					if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
