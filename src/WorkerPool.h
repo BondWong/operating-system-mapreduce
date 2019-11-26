@@ -49,7 +49,7 @@ std::unique_ptr<masterworker::WorkerService::Stub>& WorkerPool::get_worker_stub(
 	return stub_;
 }
 
-void WorkerPool::release_worker(std::string& worker_ipaddr_port) {
+void WorkerPool::release_worker(const std::string& worker_ipaddr_port) {
 	std::unique_lock<std::mutex> lock(mutex);
 	free_worker_queue.push(worker_ipaddr_port);
 	lock.unlock();
