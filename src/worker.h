@@ -121,9 +121,8 @@ class Worker final: public masterworker::WorkerService::Service {
 			}
 
 			// done with region, write to file
-			const int& id_str = region->id();
-			std::string& id = std::to_string(id_str);
-			std::string output_filepath("./output/output_" + ip_addr_port + "_" + id);
+			const int& id = region->id();
+			std::string output_filepath("./output/output_" + ip_addr_port + "_" + std::to_string(id));
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
