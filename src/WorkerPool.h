@@ -19,7 +19,7 @@ public:
 	WorkerPool(const std::vector<std::string>& worker_ipaddr_ports);
 
 	std::unique_ptr<masterworker::WorkerService::Stub>& get_worker_stub();
-	void release_worker(std::string& worker_ipaddr_port);
+	void release_worker(const std::string& worker_ipaddr_port);
 	bool done();
 
 private:

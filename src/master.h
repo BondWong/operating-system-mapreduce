@@ -74,7 +74,8 @@ void Master::asyncCompleteRpcMap() {
 			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
 			return;
 		}
-		workerPool->release_worker(call->res.worker_ipaddr_port());
+		std::string worker = call->res.worker_ipaddr_port();
+		workerPool->release_worker(worker);
 		mapResults.push_back(call->res);
 		delete call;
 	}
