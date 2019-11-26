@@ -149,7 +149,8 @@ bool Master::run() {
 	int start_line = 0;
 	int line_cnt = 0;
 
-	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
+	mapRes_it = mapResults.begin();
+	while (mapRes_it != mapResults.end()) {
 		std::ifstream interm_file(mapRes_it->file_path());
 		if (!interm_file.is_open()) {
 			std::cerr << "Error when opening file: " << mapRes_it->file_path() << std::endl;
