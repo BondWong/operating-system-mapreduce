@@ -30,6 +30,8 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 	int fileshard_id = 0;
 	FileShard* cur_shard = new FileShard;
 	cur_shard->id = fileshard_id;
+	std::vector<ShardComponent> comps;
+	cur_shard->components = comps;
 	int cur_size = 0;
 
 	std::cout << "hi~" << std::endl;
@@ -62,6 +64,9 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 				cur_size = 0;
 				fileshard_id++;
 				cur_shard = new FileShard;
+				cur_shard->id = fileshard_id;
+				std::vector<ShardComponent> comps;
+				cur_shard->components = comps;
 
 				print_component(component);
 			}
