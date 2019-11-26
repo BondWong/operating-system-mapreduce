@@ -31,7 +31,8 @@ class Worker final: public masterworker::WorkerService::Service {
 		int map_number;
 		std::string ip_addr_port;
 
-		grpc::Status HelloWorld() override {
+		grpc::Status HelloWorld(masterworker::Result* res) override {
+			res->file_path = "hi~";
 			std::cout << "I am worker " << ip_addr_port << std::endl;
 			return grpc::Status::OK;
 		}
