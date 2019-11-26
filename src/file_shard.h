@@ -32,16 +32,23 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 	cur_shard->id = fileshard_id;
 	int cur_size = 0;
 
+	std::cout << "hi~" << std::endl;
 	std::vector<std::string>::const_iterator it = mr_spec.input_files.begin();
 	while (it != mr_spec.input_files.end()) {
 		int start_line = 0;
 		int line_cnt = 0;
 
-		std::ifstream infile(*it);
+		std::ifstream intput_file(*it);
+		if (!intput_file.is_open()) {
+			std::cerr << "Error when opening file: " << *it << std::endl;
+			return false;
+		}
+
 		std::string line;
-		while (std::getline(infile, line)) {
-			// find one component
+		while (std::getline(intput_file, line)) {
+			// find a component
 			if (cur_size + line.length() > shard_size) {
+				std::cout << "Found a component" << std::endl;
 				ShardComponent* component;
 				component->file_path = *it;
 				component->start = start_line;
@@ -64,13 +71,16 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		}
 
 		// handle remaining
-		ShardComponent* component;
-		component->file_path = *it;
-		component->start = start_line;
-		component->size = line_cnt;
-		cur_shard->components.push_back(*component);
+		if (cur_size > 0) {
+			std::cout << "Hanle remaining component" << std::endl;
+			ShardComponent* component;
+			component->file_path = *it;
+			component->start = start_line;
+			component->size = line_cnt;
+			cur_shard->components.push_back(*component);
 
-		print_component(component);
+			print_component(component);
+		}
 		// handle next file
 		it++;
 	}
