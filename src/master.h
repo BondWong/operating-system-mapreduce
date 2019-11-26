@@ -156,7 +156,10 @@ bool Master::run() {
 		std::string line;
 		while (std::getline(interm_file, line)) {
 			// find a shard
-			if (cur_size == region_size - 1) {
+			cur_size++;
+			line_cnt++;
+
+			if (cur_size == region_size) {
 				std::cout << "Found a shard of size: " << cur_size << std::endl;
 				masterworker::Shard region;
 				region.set_id(region_id);
@@ -171,9 +174,9 @@ bool Master::run() {
 				region_id++;
 				executeReduce(region);
 			}
-			cur_size++;
-			line_cnt++;
 		}
+
+		std::cout << "heyhey~" << std::endl;
 
 		if (cur_size > 0) {
 			std::cout << "Found a shard of size: " << cur_size << std::endl;
@@ -187,6 +190,8 @@ bool Master::run() {
 			region_id++;
 			executeReduce(region);
 		}
+
+		std::cout << "hihi~" << std::endl;
 
 		// clear for next file
 		start_line = 0;
