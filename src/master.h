@@ -186,7 +186,7 @@ bool Master::run() {
 		line_cnt = 0;
 
 		// handle next file
-		it++;
+		mapRes_it++;
 	}
 
 	// block till all reduce jobs finished

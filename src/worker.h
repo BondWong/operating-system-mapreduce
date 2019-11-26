@@ -79,16 +79,23 @@ class Worker final: public masterworker::WorkerService::Service {
 		}
 
 		grpc::Status Reduce(grpc::ServerContext* ctx, const masterworker::Shard* region, masterworker::Result* res) override {
-			std::cout << "I am worker " << ip_addr_port << std::endl;
 			auto reducer = get_reducer_from_task_factory("cs6210");
 
 			for (int i = 0; i < region->components_size(); i++) {
 				const masterworker::ShardComponent& comp = region->components(i);
 				const std::string& file_path = comp.file_path();
+				int start = comp.start();
+				int size = comp.size();
 				std::ifstream source_file(file_path);
 				std::string line;
 				std::vector<std::string> vals;
 				std::string prev_key;
+
+				std::cout << "Worker " << ip_addr_port << ": "
+					<< file_path << "-" << start << "-" << size << std::endl;
+
+				// loop to the starting line
+				for (int j = 0; j < start; j++) std::getline(source_file, line);
 
 				while (std::getline(source_file, line)) {
 					std::istringstream iss(line);
