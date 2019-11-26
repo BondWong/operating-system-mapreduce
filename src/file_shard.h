@@ -78,8 +78,8 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		if (cur_size > 0) {
 			std::cout << "Hanle remaining component of size: " << cur_size << std::endl;
 			ShardComponent* component;
-			std::cout << "file_path~" << std::endl;
-			component->file_path = *it;
+			std::cout << "file_path " << *it << std::endl;
+			component->file_path = "test";
 			std::cout << "start~" << std::endl;
 			component->start = start_line;
 			std::cout << "size~" << std::endl;
