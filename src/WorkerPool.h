@@ -18,19 +18,17 @@ class WorkerPool {
 public:
 	WorkerPool(std::vector<std::string>& worker_ipaddr_ports);
 	~WorkerPool();
-	void execute();
-	void terminate();
+	void executeMap();
+	void executeReduce();
 
 private:
-	std::map<std::string, std::unique_ptr<MapReduceWorkerService::Stub> > workers;
+	std::map<std::string, std::unique_ptr<masterworker::MapReduceWorkerService::Stub> > workers;
 	std::queue<std::string> free_worker_queue;
 	std::mutex mutex;
 	std::condition_variable condition;
 
 	std::string get_worker();
 	void release_worker(std::string& worker_ipaddr_port);
-	void executeMap();
-	void executeReduce();
 };
 
 
@@ -38,8 +36,8 @@ WorkerPool::WorkerPool(const std::vector<std::string>& worker_ipaddr_ports) {
 	for (auto& worker_ipaddr_port: worker_ipaddr_ports) {
 		std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel(worker_ipaddr_port,
 			grpc::InsecureChannelCredentials());
-		std::unique_ptr<MapReduceWorkerService::Stub> stub(MapReduceWorkerService::NewStub(channel));
-		std::pair<std::string, std::unique_ptr<MapReduceWorkerService::Stub> > p(worker_ipaddr_port, stub);
+		std::unique_ptr<masterworker::MapReduceWorkerService::Stub> stub(masterworker::MapReduceWorkerService::NewStub(channel));
+		std::pair<std::string, std::unique_ptr<masterworker::MapReduceWorkerService::Stub> > p(worker_ipaddr_port, stub);
 		workers.insert(p);
 		free_worker_queue.push(worker_ipaddr_port);
 	}
