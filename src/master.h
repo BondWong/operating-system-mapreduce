@@ -28,7 +28,7 @@ class Master {
 			grpc::Status status;
 			masterworker::Result res;
 			std::unique_ptr<grpc::ClientAsyncResponseReader<masterworker::Result> > response_reader;
-		}
+		};
 
 		WorkerPool* workerPool;
 		grpc::CompletionQueue cq;
