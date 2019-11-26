@@ -54,6 +54,7 @@ void WorkerPool::release_worker(const std::string& worker_ipaddr_port) {
 	free_worker_queue.push(worker_ipaddr_port);
 	lock.unlock();
 	condition.notify_one();
+	std::cout << "release worker: " << worker_ipaddr_port << std::endl;
 }
 
 bool WorkerPool::done() {
@@ -67,5 +68,6 @@ std::string WorkerPool::get_worker() {
 	free_worker_queue.pop();
 	lock.unlock();
 	condition.notify_one();
+	std::cout << "get worker: " << worker_ipaddr_port << std::endl;
 	return worker_ipaddr_port;
 }
