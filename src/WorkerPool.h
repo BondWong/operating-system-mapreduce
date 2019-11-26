@@ -41,7 +41,7 @@ WorkerPool::WorkerPool(const std::vector<std::string>& worker_ipaddr_ports) {
 	}
 }
 
-std::thread& WorkerPool::executeMap(const masterworker::Shard* shard, masterworker::Result* res) {
+std::thread WorkerPool::executeMap(const masterworker::Shard* shard, masterworker::Result* res) {
 	std::function<void()> job = [&]() {
 		std::string worker = get_worker();
 		std::unique_ptr<WorkerService::Stub>& stub_ = workers.at(workder_ipaddr_port);
@@ -56,7 +56,7 @@ std::thread& WorkerPool::executeMap(const masterworker::Shard* shard, masterwork
 	return t;
 }
 
-std::thread& WorkerPool::executeReduce(const masterworker::Region* region, masterworker::Result* res) {
+std::thread WorkerPool::executeReduce(const masterworker::Region* region, masterworker::Result* res) {
 	std::function<void()> job = [&]() {
 		std::string worker = get_worker();
 		std::unique_ptr<WorkerService::Stub>& stub_ = workers.at(workder_ipaddr_port);

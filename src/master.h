@@ -23,11 +23,6 @@ class Master {
 
 	private:
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
-		struct JobInfo {
-			std::thread t;
-			masterworker::Result res;
-		};
-
 		WorkerPool workerPool;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
@@ -47,7 +42,8 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 bool Master::run() {
 	// do map works with blocking queue, thread pool idea from my last assignment
 	std::vector<FileShard>::const_iterator it;
-	std::vector<struct JobInfo> jobInfos;
+	std::vector<masterworker::Result> results;
+	std::vector<std::vector> threads;
 	for (it = file_shards.begin(); it != file_shards.end(); it++) {
 		masterworker::Shard shard;
 		shard.set_id(it->id);
@@ -59,37 +55,36 @@ bool Master::run() {
 			component->set_size((*component_it).size);
 		}
 
-		struct JobInfo jobInfo;
-		std::thread t = workerPool.executeMap(&shard, &jobInfo.res);
-		jobInfo.t = t;
-		jobInfos.push_back(jobInfo);
+		masterworker::Result res;
+		threads.push_back(workerPool.executeMap(&shard, &res));
+		results.push_back(res);
 	}
 
 	// block till all map jobs finished
-	for (struct JobInfo &jobInfo: jobInfos) jobInfo.t.join();
+	for (auto& t: threads) t.join();
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 1;
-	int region_size = jobInfos / mr_spec.n_output_files;
-	std::vector<struct JobInfo> reduceInfos;
+	int region_size = results.size() / mr_spec.n_output_files;
+	std::vector<masterworker::Result> reduceResults;
+	std::vector<std::vector> reduceThreads;
 	int i = 0;
-	while (i < jobInfos.size()) {
+	while (i < results.size()) {
 		int j = i;
 		masterworker::Region region;
 		region.set_id(region_id++);
-		while (j < jobInfos.size() && j < region_size) {
-			region.add_file_paths(jobInfos.at(i).res.file_path);
+		while (j < results.size() && j < region_size) {
+			region.add_file_paths(results.at(i).res.file_path);
 			j++;
 		}
 
-		struct JobInfo reduceJobInfo;
-		std::thread t = workerPool.executeReduce(&region, &reduceJobInfo.res);
-		reduceJobInfo.t = t;
-		reduceInfos.push_back(reduceJobInfo);
+		masterworker::Result res;
+		reduceThreads.push_back(workerPool.executeReduce(&region, &res));
+		reduceResults.push_back(res);
 		i = j;
 	}
 
 	// block till all reduce jobs finished
-	for (struct JobInfo &jobInfo: reduceInfos) jobInfo.t.join();
+	for (auto& t: reduceThreads) t.join();
 	return true;
 }
