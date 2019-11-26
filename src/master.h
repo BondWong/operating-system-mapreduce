@@ -73,7 +73,7 @@ bool Master::run() {
 		masterworker::Region region;
 		region.set_id(region_id++);
 		while (j < results.size() && j < region_size) {
-			region.add_file_paths(results.at(i));
+			region.add_file_paths(results.at(i).file_path);
 			j++;
 		}
 
