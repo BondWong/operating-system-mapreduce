@@ -24,10 +24,18 @@ class Master {
 	private:
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 		WorkerPool* workerPool;
+		CompletionQueue cq;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
+		std::vector<masterworker::Result> mapResults;
 
-		std::string get_worker();
+		void executeMap(const masterworker::Shard& shard);
+		void asyncCompleteRpcMap();
+		std::thread mapRepDaemonThread;
+
+		// std::thread executeReduce(const masterworker::Region& region);
+		// void asyncCompleteRpcReduce();
+		// std::thread reduceRepDaemonThread;
 };
 
 /* CS6210_TASK: This is all the information your master will get from the framework.
@@ -35,8 +43,35 @@ class Master {
 Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_shards)
  	: mr_spec(mr_spec), file_shards(file_shards) {
 	workerPool = new WorkerPool(mr_spec.worker_ipaddr_ports);
+	mapRepDaemonThread = std::thread(&Master::asyncCompleteRpcMap, this);
 }
 
+// const masterworker::Shard& shard, masterworker::Result* res
+
+void Master::executeMap(const masterworker::Shard& shard) {
+	// idea from this link https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/greeter_async_client2.cc#L54
+	grpc::AsyncClientCall *call = new grpc::AsyncClientCall;
+	std::unique_ptr<masterworker::WorkerService::Stub>& stub_= workerPool->get_worker_stub();
+	call->response_reader = stub_->AsyncMap(&call->context, shard, &cq);
+	call->response_reader->Finish(&call->reply, &call->status, (void*) call);
+}
+
+void Master::asyncCompleteRpcMap() {
+	void *got_tag;
+	bool ok = false;
+	// wait for the next available response
+	while (cq.Next(&got_tag, &ok)) {
+		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
+		GPR_ASSERT(ok);
+		if (!call->status.ok()) {
+			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
+			return;
+		}
+		workerPool.release_worker(call->reply.worker_ipaddr_port());
+		mapResults.push_back(*(call->reply));
+		delete call;
+	}
+}
 
 /* CS6210_TASK: Here you go. once this function is called you will complete whole map reduce task and return true if succeeded */
 bool Master::run() {
@@ -54,14 +89,11 @@ bool Master::run() {
 			component->set_start(component_it->start);
 			component->set_size(component_it->size);
 		}
-
-		masterworker::Result res;
-		threads.push_back(workerPool->executeMap(shard, &res));
-		results.push_back(res);
+		executeMap(shard);
 	}
 
 	// block till all map jobs finished
-	for (auto& t: threads) t.join();
+	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	// // do reduce works with blocking queue, thread pool idea from my last assignment
 	// int region_id = 1;
