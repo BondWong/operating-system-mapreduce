@@ -52,6 +52,7 @@ std::unique_ptr<masterworker::WorkerService::Stub>& WorkerPool::get_worker_stub(
 void WorkerPool::release_worker(const std::string& worker_ipaddr_port) {
 	std::unique_lock<std::mutex> lock(mutex);
 	free_worker_queue.push(worker_ipaddr_port);
+	std::cout << "pool release: " << worker_ipaddr_port << std::endl;
 	lock.unlock();
 }
 
@@ -66,5 +67,6 @@ std::string WorkerPool::get_worker() {
 	free_worker_queue.pop();
 	lock.unlock();
 	condition.notify_one();
+	std::cout << "pool get: " << worker_ipaddr_port << std::endl;
 	return worker_ipaddr_port;
 }

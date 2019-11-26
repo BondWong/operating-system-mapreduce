@@ -86,7 +86,6 @@ void Master::asyncCompleteRpcMap() {
 void Master::executeReduce(const masterworker::Shard& shard) {
 	// idea from this link https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/greeter_async_client2.cc#L101
 	AsyncClientCall* call = new AsyncClientCall;
-	std::cout << "hi~" << std::endl;
 	std::unique_ptr<masterworker::WorkerService::Stub>& stub_= workerPool->get_worker_stub();
 	call->response_reader = stub_->AsyncReduce(&call->context, shard, &cq);
 	call->response_reader->Finish(&call->res, &call->status, (void*) call);
@@ -128,9 +127,6 @@ bool Master::run() {
 
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
-	for (std::vector<masterworker::Result>::const_iterator it = mapResults.begin(); it != mapResults.end(); it++) {
-		std::cout << it->file_path() << std::endl;
-	}
 
 	int total_line_cnt = 0;
 	std::vector<masterworker::Result>::const_iterator mapRes_it;
