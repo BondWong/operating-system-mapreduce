@@ -139,7 +139,6 @@ bool Master::run() {
 	std::vector<std::string>::const_iterator mapRes_it;
 	for (mapRes_it = mapFiles.begin(); mapRes_it != mapFiles.end(); mapRes_it++) {
 		const std::string& file_path = *mapRes_it;
-		std::cout << file_path << std::endl;
 		std::ifstream interm_file(file_path);
 		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 	}
