@@ -31,15 +31,16 @@ class Master {
 		};
 
 		WorkerPool* workerPool;
-		grpc::CompletionQueue cq;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
 		std::vector<std::string> mapFiles;
 
+		grpc::CompletionQueue cq_map;
 		void executeMap(const masterworker::Shard& shard);
 		void asyncCompleteRpcMap();
 		std::thread mapRepDaemonThread;
 
+		grpc::CompletionQueue cq_reduce;
 		void executeReduce(const masterworker::Shard& region);
 		void asyncCompleteRpcReduce();
 		std::thread reduceRepDaemonThread;
@@ -60,7 +61,7 @@ void Master::executeMap(const masterworker::Shard& shard) {
 	// idea from this link https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/greeter_async_client2.cc#L101
 	AsyncClientCall* call = new AsyncClientCall;
 	std::unique_ptr<masterworker::WorkerService::Stub>& stub_= workerPool->get_worker_stub();
-	call->response_reader = stub_->PrepareAsyncMap(&call->context, shard, &cq);
+	call->response_reader = stub_->PrepareAsyncMap(&call->context, shard, &cq_map);
 	call->response_reader->StartCall();
 	call->response_reader->Finish(&call->res, &call->status, (void*) call);
 }
@@ -69,7 +70,7 @@ void Master::asyncCompleteRpcMap() {
 	void *got_tag;
 	bool ok = false;
 	// wait for the next available response
-	while (cq.Next(&got_tag, &ok)) {
+	while (cq_map.Next(&got_tag, &ok)) {
 		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 		GPR_ASSERT(ok);
 		if (!call->status.ok()) {
@@ -88,7 +89,7 @@ void Master::executeReduce(const masterworker::Shard& shard) {
 	// idea from this link https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/greeter_async_client2.cc#L101
 	AsyncClientCall* call = new AsyncClientCall;
 	std::unique_ptr<masterworker::WorkerService::Stub>& stub_= workerPool->get_worker_stub();
-	call->response_reader = stub_->PrepareAsyncMap(&call->context, shard, &cq);
+	call->response_reader = stub_->PrepareAsyncMap(&call->context, shard, &cq_reduce);
 	call->response_reader->StartCall();
 	call->response_reader->Finish(&call->res, &call->status, (void*) call);
 }
@@ -97,7 +98,7 @@ void Master::asyncCompleteRpcReduce() {
 	void *got_tag;
 	bool ok = false;
 	// wait for the next available response
-	while (cq.Next(&got_tag, &ok)) {
+	while (cq_reduce.Next(&got_tag, &ok)) {
 		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 		GPR_ASSERT(ok);
 		if (!call->status.ok()) {
