@@ -101,7 +101,7 @@ bool Master::run() {
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(5));
 	for (std::vector<masterworker::Result>::const_iterator it = mapResults.begin(); it != mapResults.end(); it++) {
-		std::cout << it->file_path << std::endl;
+		std::cout << it->file_path() << std::endl;
 	}
 
 	// // do reduce works with blocking queue, thread pool idea from my last assignment
