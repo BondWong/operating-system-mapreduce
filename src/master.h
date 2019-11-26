@@ -77,8 +77,9 @@ void Master::asyncCompleteRpcMap() {
 			return;
 		}
 		std::string worker = call->res.worker_ipaddr_port();
-		workerPool->release_worker(worker);
-		mapFiles.push_back(call->res.file_path());
+		std::string fiel_path = call->res.file_path();
+		workerPool->release_worker(worker, fiel_path);
+		mapFiles.push_back(fiel_path);
 		delete call;
 	}
 }
