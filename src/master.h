@@ -158,7 +158,7 @@ bool Master::run() {
 				masterworker::Shard region;
 				region.set_id(region_id);
 				masterworker::ShardComponent *component = region.add_components();
-				component->set_file_path(*mapRes_it);
+				component->set_file_path(mapRes_it->file_path());
 				component->set_start(start_line);
 				component->set_size(line_cnt - start_line);
 				// clear for next shard
