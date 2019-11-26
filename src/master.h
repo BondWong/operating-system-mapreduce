@@ -133,7 +133,7 @@ bool Master::run() {
 	while (mapRes_cnt != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		int status_cnt = statuses.size();
-		for (int i = 0; i < status_cnt; i++) std::cout << status_cnt.at(i) << std::endl;
+		for (int i = 0; i < status_cnt; i++) std::cout << statuses.at(i) << std::endl;
 		// mapRes_cnt = mapResults.size();
 		// for (int i = 0; i < mapRes_cnt; i++) {
 		// 	std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
