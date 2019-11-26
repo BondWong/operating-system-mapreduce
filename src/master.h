@@ -166,7 +166,7 @@ bool Master::run() {
 				masterworker::ShardComponent *component = region.add_components();
 				component->set_file_path(mapRes_it->file_path());
 				component->set_start(start_line);
-				component->set_size(line_cnt - start_line);
+				component->set_size(cur_size);
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
@@ -183,7 +183,7 @@ bool Master::run() {
 			masterworker::ShardComponent *component = region.add_components();
 			component->set_file_path(mapRes_it->file_path());
 			component->set_start(start_line);
-			component->set_size(line_cnt - start_line);
+			component->set_size(cur_size);
 
 			region_id++;
 			executeReduce(region);
