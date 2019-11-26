@@ -135,7 +135,7 @@ bool Master::run() {
 		std::unique_lock<std::mutex> lock(mutex);
 		mapRes_cnt = mapResults.size();
 		for (int i = 0; i < mapRes_cnt; i++) {
-			std::cout << mapResults.at(i).file_path() + " " + mapResults.worker_ipaddr_port() << std::endl;
+			std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
 		}
 		lock.unlock();
 	}
