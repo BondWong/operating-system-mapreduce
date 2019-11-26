@@ -124,7 +124,6 @@ class Worker final: public masterworker::MapReduceWorkerService::Service {
 		}
 };
 
-
 /* CS6210_TASK: ip_addr_port is the only information you get when started.
 	You can populate your other class data members here if you want */
 Worker::Worker(std::string ip_addr_port): ip_addr_port(ip_addr_port) {
@@ -136,13 +135,14 @@ Worker::Worker(std::string ip_addr_port): ip_addr_port(ip_addr_port) {
 	Note that you have the access to BaseMapper's member BaseMapperInternal impl_ and
 	BaseReduer's member BaseReducerInternal impl_ directly,
 	so you can manipulate them however you want when running map/reduce tasks*/
+
+// following this example https://grpc.io/docs/tutorials/basic/cpp/ to create server
 bool Worker::run() {
-	/*  Below 5 lines are just examples of how you will call map and reduce
-		Remove them once you start writing your own logic */
-	std::cout << "worker.run(), I 'm not ready yet" <<std::endl;
-	auto mapper = get_mapper_from_task_factory("cs6210");
-	mapper->map("I m just a 'dummy', a \"dummy line\"");
-	auto reducer = get_reducer_from_task_factory("cs6210");
-	reducer->reduce("dummy", std::vector<std::string>({"1", "1"}));
+	ServerBuilder builder;
+	builder.AddListeningPort(ip_addr_port, grpc::InsecureServerCredentials());
+	builder.RegisterService(this);
+	std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+	std::cout << "Server listening on " << server_address << std::endl;
+	server->Wait();
 	return true;
 }
