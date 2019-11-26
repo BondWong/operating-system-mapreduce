@@ -65,7 +65,9 @@ bool Master::run() {
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 1;
-	int region_size = results.size() / mr_spec.n_output_files;
+	int region_size = results.size() / mr_spec.n_output_files == 0
+		? results.size()
+		: results.size() / mr_spec.n_output_files;
 	std::vector<std::thread> reduceThreads;
 	int i = 0;
 	while (i < results.size()) {
