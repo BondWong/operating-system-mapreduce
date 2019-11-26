@@ -138,11 +138,11 @@ Worker::Worker(std::string ip_addr_port): ip_addr_port(ip_addr_port) {
 
 // following this example https://grpc.io/docs/tutorials/basic/cpp/ to create server
 bool Worker::run() {
-	ServerBuilder builder;
+	grpc::ServerBuilder builder;
 	builder.AddListeningPort(ip_addr_port, grpc::InsecureServerCredentials());
 	builder.RegisterService(this);
 	std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-	std::cout << "Server listening on " << server_address << std::endl;
+	std::cout << "Server listening on " << ip_addr_port << std::endl;
 	server->Wait();
 	return true;
 }
