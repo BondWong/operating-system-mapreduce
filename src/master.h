@@ -79,6 +79,8 @@ void Master::asyncCompleteRpcMap() {
 		std::string worker = call->res.worker_ipaddr_port();
 		workerPool->release_worker(worker);
 		std::unique_lock<std::mutex> lock(mutex);
+		std::cout << "async rep" << std::endl;
+		std::cout << call->res.file_path() + " " + call->res.worker_ipaddr_port() << std::endl;
 		mapResults.push_back(call->res);
 		lock.unlock();
 		delete call;
@@ -137,6 +139,7 @@ bool Master::run() {
 		for (int i = 0; i < mapRes_cnt; i++) {
 			std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
 		}
+		std::cout << std::endl;
 		lock.unlock();
 	}
 
