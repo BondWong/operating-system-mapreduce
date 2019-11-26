@@ -50,9 +50,9 @@ bool Master::run() {
 		std::vector<masterworker::ShardComponent>::const_iterator component_it;
 		for (component_it = it->components.begin(); component_it != it->components.end(); component_it++) {
 			masterworker::ShardComponent *component = shard.add_components();
-			component->set_file_path((*component_it).file_path);
-			component->set_start((*component_it).start);
-			component->set_size((*component_it).size);
+			component->set_file_path(component_it->file_path());
+			component->set_start(component_it->start());
+			component->set_size(component_it->size());
 		}
 
 		masterworker::Result res;
@@ -66,7 +66,6 @@ bool Master::run() {
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 1;
 	int region_size = results.size() / mr_spec.n_output_files;
-	std::vector<masterworker::Result> reduceResults;
 	std::vector<std::thread> reduceThreads;
 	int i = 0;
 	while (i < results.size()) {
@@ -74,17 +73,17 @@ bool Master::run() {
 		masterworker::Region region;
 		region.set_id(region_id++);
 		while (j < results.size() && j < region_size) {
-			region.add_file_paths(results.at(i).res.file_path);
+			region.add_file_paths(results.at(i));
 			j++;
 		}
 
 		masterworker::Result res;
 		reduceThreads.push_back(workerPool.executeReduce(&region, &res));
-		reduceResults.push_back(res);
 		i = j;
 	}
 
 	// block till all reduce jobs finished
 	for (auto& t: reduceThreads) t.join();
+
 	return true;
 }
