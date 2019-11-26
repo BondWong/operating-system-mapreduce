@@ -82,8 +82,10 @@ class Worker final: public masterworker::WorkerService::Service {
 			std::cout << "I am worker " << ip_addr_port << std::endl;
 			auto reducer = get_reducer_from_task_factory("cs6210");
 
-			for (int i = 0; i < region->file_paths_size(); i++) {
-				std::ifstream source_file(region->file_paths(i));
+			for (int i = 0; i < region->components_size(); i++) {
+				const masterworker::ShardComponent& comp = shard->components(i);
+				const std::string& file_path = comp.file_path();
+				std::ifstream source_file(file_path);
 				std::string line;
 				std::vector<std::string> vals;
 				std::string prev_key;
@@ -92,9 +94,9 @@ class Worker final: public masterworker::WorkerService::Service {
 					std::istringstream iss(line);
 					std::string key, val;
 					if (!std::getline(iss, key, ' ') || !std::getline(iss, val)) {
-						std::cerr << "Error when processing intermediate file in reduce function: " << region->file_paths(i) << std::endl;
+						std::cerr << "Error when processing intermediate file in reduce function: " << file_path << std::endl;
 						return grpc::Status(grpc::StatusCode::INTERNAL,
-							"Error when processing intermediate file in reduce function: " + region->file_paths(i));
+							"Error when processing intermediate file in reduce function: " + file_path);
 					}
 
 					if (prev_key.compare("") != 0 && prev_key.compare(key) != 0) {
