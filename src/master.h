@@ -131,10 +131,12 @@ bool Master::run() {
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
 	int mapRes_cnt = 0;
 	while (mapRes_cnt != file_shards.size()) {
-		std::cout << mapRes_cnt << " " << file_shards.size() << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		std::unique_lock<std::mutex> lock(mutex);
 		mapRes_cnt = mapResults.size();
+		for (int i = 0; i < mapRes_cnt; i++) {
+			std::cout << mapResults.at(i).file_path() + " " + mapResults.worker_ipaddr_port() << std::endl;
+		}
 		lock.unlock();
 	}
 
