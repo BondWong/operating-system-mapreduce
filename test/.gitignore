@@ -1,7 +1,5 @@
 *
 !*.*
 *.o
-!*/*.txt
 !Makefile
 !.gitignore
-
