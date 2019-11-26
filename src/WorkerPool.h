@@ -64,13 +64,13 @@ bool WorkerPool::done() {
 	return size == free_worker_queue.size();
 }
 
-std::vector<std::string> get_results() {
-	return results;
-}
-
-void clear_results() {
-	results.clear();
-}
+// std::vector<std::string> get_results() {
+// 	return results;
+// }
+//
+// void clear_results() {
+// 	results.clear();
+// }
 
 std::string WorkerPool::get_worker() {
 	std::unique_lock<std::mutex> lock(mutex);
