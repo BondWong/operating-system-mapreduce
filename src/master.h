@@ -25,9 +25,9 @@ class Master {
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 		struct AsyncClientCall {
 			grpc::ClientContext context;
-			Status status;
+			grpc::Status status;
 			masterworker::Result res;
-			std::unique_ptr<ClientAsyncResponseReader<masterworker::Result> > response_reader;
+			std::unique_ptr<grpc::ClientAsyncResponseReader<masterworker::Result> > response_reader;
 		}
 
 		WorkerPool* workerPool;
