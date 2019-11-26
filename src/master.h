@@ -196,7 +196,7 @@ bool Master::run() {
 		if (cur_size > 0) {
 			std::cout << "Found a region of size: " << cur_size << std::endl;
 			masterworker::Shard region;
-			if (regions.back() == NULL) region = regions.back();
+			if (regions.size() != 0) region = regions.back();
 			masterworker::ShardComponent *component = region.add_components();
 			component->set_file_path(file_path);
 			component->set_start(start_line);
