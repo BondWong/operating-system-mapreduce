@@ -33,7 +33,7 @@ inline bool fill_marspec(MapReduceSpec& mr_spec, const std::string& key, const s
 	} else if (key.compare("map_kilobytes") == 0) {
 		mr_spec.map_kilobytes = std::stoi(val);
 	} else if (key.compare("n_output_files") == 0) {
-		mr_spec.map_kilobytes = std::stoi(val);
+		mr_spec.n_output_files = std::stoi(val);
 	} else if (key.compare("output_dir") == 0) {
 		mr_spec.output_dir = val;
 	} else {
