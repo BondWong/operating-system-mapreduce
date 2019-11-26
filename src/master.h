@@ -131,7 +131,8 @@ bool Master::run() {
 	int total_line_cnt = 0;
 	std::vector<masterworker::Result>::const_iterator mapRes_it;
 	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
-		std::ifstream interm_file(mapRes_it->file_path());
+		const std::string& file_path = mapRes_it->file_path();
+		std::ifstream interm_file(file_path);
 	  total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 	}
 
@@ -188,7 +189,7 @@ bool Master::run() {
 			masterworker::Shard region;
 			region.set_id(region_id);
 			masterworker::ShardComponent *component = region.add_components();
-			component->set_file_path(mapRes_it->file_path());
+			component->set_file_path(file_path);
 			component->set_start(start_line);
 			component->set_size(cur_size);
 
