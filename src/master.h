@@ -50,9 +50,9 @@ bool Master::run() {
 		std::vector<ShardComponent>::const_iterator component_it;
 		for (component_it = it->components.begin(); component_it != it->components.end(); component_it++) {
 			masterworker::ShardComponent *component = shard.add_components();
-			component->set_file_path(component_it->file_path());
-			component->set_start(component_it->start());
-			component->set_size(component_it->size());
+			component->set_file_path(component_it->file_path);
+			component->set_start(component_it->start);
+			component->set_size(component_it->size);
 		}
 
 		masterworker::Result res;

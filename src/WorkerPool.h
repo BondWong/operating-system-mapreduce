@@ -47,8 +47,8 @@ std::thread WorkerPool::executeMap(const masterworker::Shard* shard, masterworke
 		std::unique_ptr<WorkerService::Stub>& stub_ = workers.at(workder_ipaddr_port);
 		grcp::ClientContext context;
 		masterworker::Result res;
-		grpc::Status status = stub_->map(&context, &shard, &res);
-		if (!status.IsOk()) std::cerr << status.error_message() << std::endl;
+		grpc::Status status = stub_.map(&context, &shard, &res);
+		if (!status.ok()) std::cerr << status.error_message() << std::endl;
 		release_worker(worker);
 	};
 
@@ -60,10 +60,10 @@ std::thread WorkerPool::executeReduce(const masterworker::Region* region, master
 	std::function<void()> job = [&]() {
 		std::string worker = get_worker();
 		std::unique_ptr<WorkerService::Stub>& stub_ = workers.at(workder_ipaddr_port);
-		grcp::ClientContext context;
+		grpc::ClientContext context;
 		masterworker::Result res;
-		grpc::Status status = stub_->reduce(&context, &region, &res);
-		if (!status.IsOk()) std::cerr << status.error_message() << std::endl;
+		grpc::Status status = stub_.reduce(&context, &region, &res);
+		if (!status.ok()) std::cerr << status.error_message() << std::endl;
 		release_worker(worker);
 	};
 
