@@ -34,8 +34,7 @@ class Master {
 		grpc::CompletionQueue cq;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
-		std::vector<masterworker::Result> mapResults;
-		std::vector<std::string> statuses;
+		std::vector<std::string> mapFiles;
 
 		void executeMap(const masterworker::Shard& shard);
 		void asyncCompleteRpcMap();
@@ -74,14 +73,12 @@ void Master::asyncCompleteRpcMap() {
 		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 		GPR_ASSERT(ok);
 		if (!call->status.ok()) {
-			statuses.push_back("no");
 			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
 			return;
 		}
-		statuses.push_back("ok");
 		std::string worker = call->res.worker_ipaddr_port();
 		workerPool->release_worker(worker);
-		mapResults.push_back(call->res);
+		mapFiles.push_back(call->res.file_path());
 		delete call;
 	}
 }
@@ -137,17 +134,15 @@ bool Master::run() {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		int status_cnt = statuses.size();
 		for (int i = 0; i < status_cnt; i++) std::cout << statuses.at(i) << std::endl;
-		// mapRes_cnt = mapResults.size();
-		// for (int i = 0; i < mapRes_cnt; i++) {
-		// 	std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
-		// }
+		mapRes_cnt = mapFiles.size();
+		for (int i = 0; i < mapRes_cnt; i++) std::cout << mapFiles.at(i) + " " + mapFiles.at(i) << std::endl;
 		std::cout << std::endl;
 	}
 
 	int total_line_cnt = 0;
-	std::vector<masterworker::Result>::const_iterator mapRes_it;
-	for (std::vector<masterworker::Result>::const_iterator mapRes_it = mapResults.begin();
-		mapRes_it != mapResults.end(); mapRes_it++) {
+	std::vector<std::string>::const_iterator mapRes_it;
+	for (std::vector<std::string>::const_iterator mapRes_it = mapFiles.begin();
+		mapRes_it != mapFiles.end(); mapRes_it++) {
 		const std::string& file_path = mapRes_it->file_path();
 		std::ifstream interm_file(file_path);
 		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
@@ -161,9 +156,9 @@ bool Master::run() {
 	int line_cnt = 0;
 	std::vector<masterworker::Shard> regions;
 
-	mapRes_it = mapResults.begin();
-	while (mapRes_it != mapResults.end()) {
-		const std::string& file_path = mapRes_it->file_path();
+	mapRes_it = mapFiles.begin();
+	while (mapRes_it != mapFiles.end()) {
+		const std::string& file_path = *mapRes_it;
 		std::ifstream interm_file(file_path);
 		if (!interm_file.is_open()) {
 			std::cerr << "Error when opening file: " << file_path << std::endl;
