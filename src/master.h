@@ -85,8 +85,6 @@ void Master::asyncCompleteRpcMap() {
 bool Master::run() {
 	// do map works with blocking queue, thread pool idea from my last assignment
 	std::vector<FileShard>::const_iterator it;
-	std::vector<masterworker::Result> results;
-	std::vector<std::thread> threads;
 	for (it = file_shards.begin(); it != file_shards.end(); it++) {
 		masterworker::Shard shard;
 		shard.set_id(it->id);
@@ -102,6 +100,9 @@ bool Master::run() {
 
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(5));
+	for (std::vector<masterworker::Result>::const_iterator it = mapResults.begin(); it != mapResults.end(); it++) {
+		std::cout << it->file_path << std::endl;
+	}
 
 	// // do reduce works with blocking queue, thread pool idea from my last assignment
 	// int region_id = 1;
