@@ -170,26 +170,17 @@ bool Master::run() {
 
 			if (cur_size == region_size) {
 				std::cout << "Found a region of size: " << cur_size << std::endl;
-				std::cout << "1" <<std::endl;
 				masterworker::Shard region;
-				std::cout << "2" <<std::endl;
 				region.set_id(region_id);
-				std::cout << "3" <<std::endl;
 				masterworker::ShardComponent *component = region.add_components();
-				std::cout << "4" <<std::endl;
 				component->set_file_path(file_path);
-				std::cout << "5" <<std::endl;
 				component->set_start(start_line);
-				std::cout << "6" <<std::endl;
 				component->set_size(cur_size);
-				std::cout << "7" <<std::endl;
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
 				region_id++;
-				std::cout << "8" <<std::endl;
 				regions.push_back(region);
-				std::cout << "9" <<std::endl;
 			}
 		}
 
