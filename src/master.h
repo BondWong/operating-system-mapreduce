@@ -78,7 +78,9 @@ void Master::asyncCompleteRpcMap() {
 		}
 		std::string worker = call->res.worker_ipaddr_port();
 		workerPool->release_worker(worker);
+		std::unique_lock<std::mutex> lock(mutex);
 		mapResults.push_back(call->res);
+		lock.unlock();
 		delete call;
 	}
 }
@@ -127,18 +129,23 @@ bool Master::run() {
 
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
+	int mapRes_cnt = 0;
+	while (mapRes_cnt != file_shards.size()) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::unique_lock<std::mutex> lock(mutex);
+		mapRes_cnt = mapResults.size();
+		lock.unlock();
+	}
 
 	int total_line_cnt = 0;
 	std::vector<masterworker::Result>::const_iterator mapRes_it;
-	while (total_line_cnt == 0) {
-		for (std::vector<masterworker::Result>::const_iterator mapRes_it = mapResults.begin();
-			mapRes_it != mapResults.end(); mapRes_it++) {
-			const std::string& file_path = mapRes_it->file_path();
-			std::ifstream interm_file(file_path);
-		  total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
-		}
-		std::cout << "total line: " << total_line_cnt << std::endl;
+	for (std::vector<masterworker::Result>::const_iterator mapRes_it = mapResults.begin();
+		mapRes_it != mapResults.end(); mapRes_it++) {
+		const std::string& file_path = mapRes_it->file_path();
+		std::ifstream interm_file(file_path);
+		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 	}
+	std::cout << "total line: " << total_line_cnt << std::endl;
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 0;
