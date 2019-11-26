@@ -31,7 +31,7 @@ class Worker final: public masterworker::WorkerService::Service {
 		int map_number;
 		std::string ip_addr_port;
 
-		grpc::Status map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
+		grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
 			auto mapper = get_mapper_from_task_factory("cs6210");
 
 			for (int i = 0; i < shard->components_size(); i++) {
@@ -81,7 +81,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			return grpc::Status::OK;
 		}
 
-		grpc::Status reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
+		grpc::Status Reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
 			auto reducer = get_reducer_from_task_factory("cs6210");
 
 			for (int i = 0; i < region->file_paths_size(); i++) {
