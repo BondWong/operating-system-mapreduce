@@ -34,7 +34,6 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 	cur_shard->components = comps;
 	int cur_size = 0;
 
-	std::cout << "hi~" << std::endl;
 	std::vector<std::string>::const_iterator it = mr_spec.input_files.begin();
 	while (it != mr_spec.input_files.end()) {
 		int start_line = 0;
@@ -82,6 +81,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 			component->file_path = *it;
 			component->start = start_line;
 			component->size = line_cnt;
+			std::cout << "hi~" << std::endl;
 			cur_shard->components.push_back(*component);
 
 			print_component(component);
