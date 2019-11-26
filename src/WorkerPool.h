@@ -28,7 +28,6 @@ private:
 	std::queue<std::string> free_worker_queue;
 	std::mutex mutex;
 	std::condition_variable condition;
-	std::vector<std::string> results;
 
 	std::string get_worker();
 };
@@ -53,7 +52,6 @@ std::unique_ptr<masterworker::WorkerService::Stub>& WorkerPool::get_worker_stub(
 void WorkerPool::release_worker(const std::string& worker_ipaddr_port) {
 	std::unique_lock<std::mutex> lock(mutex);
 	free_worker_queue.push(worker_ipaddr_port);
-	results.push_back(res);
 	condition.notify_one();
 	lock.unlock();
 	std::cout << "release worker: " << worker_ipaddr_port << std::endl;
