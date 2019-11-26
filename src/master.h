@@ -175,7 +175,7 @@ bool Master::run() {
 				cur_size = 0;
 				region_id++;
 
-				executeReduce(region);
+				// executeReduce(region);
 				region_cnt++;
 			}
 			cur_size++;
