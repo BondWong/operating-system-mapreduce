@@ -83,7 +83,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			auto reducer = get_reducer_from_task_factory("cs6210");
 
 			for (int i = 0; i < region->components_size(); i++) {
-				const masterworker::ShardComponent& comp = shard->components(i);
+				const masterworker::ShardComponent& comp = region->components(i);
 				const std::string& file_path = comp.file_path();
 				std::ifstream source_file(file_path);
 				std::string line;
