@@ -40,6 +40,9 @@ class Worker final: public masterworker::WorkerService::Service {
 				int start = comp.start();
 				int size = comp.size();
 
+				std::cout << "Worker " << ip_addr_port << ": file_path"
+					<< file_path << "-start" << start << "-size" << size << std::endl;
+
 				std::ifstream source_file(file_path);
 				if (!source_file.is_open()) {
 					std::cerr << "Error when opening file: " << file_path << std::endl;
@@ -56,6 +59,7 @@ class Worker final: public masterworker::WorkerService::Service {
 				}
 			}
 
+			std::cout << "hi~";
 			std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
 			sort(key_vals.begin(), key_vals.end());
 
@@ -67,9 +71,11 @@ class Worker final: public masterworker::WorkerService::Service {
 					"Error when opening an output file for map function: " + output_filepath);
 			}
 
+			std::cout << "hey~";
 			std::vector<std::pair<std::string, std::string> >::iterator it;
 			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
 
+			std::cout << "hello~";
 			res->set_worker_ip_addr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 			return grpc::Status::OK;
