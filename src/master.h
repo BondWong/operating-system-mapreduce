@@ -126,7 +126,7 @@ bool Master::run() {
 	}
 
 	// block till all map jobs finished
-	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
+	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	int total_line_cnt = 0;
 	std::vector<masterworker::Result>::const_iterator mapRes_it;
@@ -172,7 +172,7 @@ bool Master::run() {
 				cur_size = 0;
 
 				region_id++;
-				// executeReduce(region);
+				executeReduce(region);
 			}
 		}
 
@@ -186,7 +186,7 @@ bool Master::run() {
 			component->set_size(line_cnt - start_line);
 
 			region_id++;
-			// executeReduce(region);
+			executeReduce(region);
 		}
 
 		// clear for next file
