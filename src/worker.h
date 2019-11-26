@@ -121,7 +121,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			}
 
 			// done with region, write to file
-			const std::string& id = region->id();
+			int& id = std::to_string(region->id());
 			std::string output_filepath("./output/output_" + ip_addr_port + "_" + id);
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
@@ -138,7 +138,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			res->set_worker_ipaddr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 
-			std::cout << "Worker-reduce: " << ip_addr_port << " done working on region: " << region->id() << std::endl;
+			std::cout << "Worker-reduce: " << ip_addr_port << " done working on region: " << id << std::endl;
 			std::cout << "Worker-reduce: " << ip_addr_port << " output file: " << output_filepath << std::endl;
 
 			return grpc::Status::OK;
