@@ -132,8 +132,6 @@ bool Master::run() {
 	int mapRes_cnt = 0;
 	while (mapRes_cnt != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		int status_cnt = statuses.size();
-		for (int i = 0; i < status_cnt; i++) std::cout << statuses.at(i) << std::endl;
 		mapRes_cnt = mapFiles.size();
 		for (int i = 0; i < mapRes_cnt; i++) std::cout << mapFiles.at(i) + " " + mapFiles.at(i) << std::endl;
 		std::cout << std::endl;
@@ -143,7 +141,7 @@ bool Master::run() {
 	std::vector<std::string>::const_iterator mapRes_it;
 	for (std::vector<std::string>::const_iterator mapRes_it = mapFiles.begin();
 		mapRes_it != mapFiles.end(); mapRes_it++) {
-		const std::string& file_path = mapRes_it->file_path();
+		const std::string& file_path = *mapRes_it;
 		std::ifstream interm_file(file_path);
 		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 	}
