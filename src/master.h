@@ -105,7 +105,7 @@ void Master::asyncCompleteRpcReduce() {
 			return;
 		}
 		std::string worker = call->res.worker_ipaddr_port();
-		workerPool->release_worker(worker);
+		workerPool->release_worker(worker, "");
 		delete call;
 	}
 }
