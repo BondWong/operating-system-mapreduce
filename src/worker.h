@@ -121,7 +121,8 @@ class Worker final: public masterworker::WorkerService::Service {
 			}
 
 			// done with region, write to file
-			std::string& id = std::to_string(region->id());
+			const int& id_str = region->id();
+			std::string& id = std::to_string(id_str);
 			std::string output_filepath("./output/output_" + ip_addr_port + "_" + id);
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
