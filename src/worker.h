@@ -85,6 +85,7 @@ class Worker final: public masterworker::WorkerService::Service {
 		grpc::Status Reduce(grpc::ServerContext* ctx, const masterworker::Shard* region, masterworker::Result* res) override {
 			auto reducer = get_reducer_from_task_factory("cs6210");
 
+			std::vector<std::string> vals;
 			for (int i = 0; i < region->components_size(); i++) {
 				const masterworker::ShardComponent& comp = region->components(i);
 				const std::string& file_path = comp.file_path();
@@ -92,7 +93,6 @@ class Worker final: public masterworker::WorkerService::Service {
 				int size = comp.size();
 				std::ifstream source_file(file_path);
 				std::string line;
-				std::vector<std::string> vals;
 				std::string prev_key;
 
 				std::cout << "Worker " << ip_addr_port << ": "
@@ -121,7 +121,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			}
 
 			// done with region, write to file
-			std::string output_filepath("./output/output_" + ip_addr_port + "_" + region.id());
+			std::string output_filepath("./output/output_" + ip_addr_port + "_" + region->id());
 			std::ofstream output_file(output_filepath);
 			if (!output_file.is_open()) {
 				std::cerr << "Error when opening an output file for reduce function: " << output_filepath << std::endl;
