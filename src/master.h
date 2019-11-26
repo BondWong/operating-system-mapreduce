@@ -163,31 +163,37 @@ bool Master::run() {
 				std::cout << "Found a shard of size: " << cur_size << std::endl;
 				masterworker::Shard region;
 				region.set_id(region_id);
+				std::cout << "1" << cur_size << std::endl;
 				masterworker::ShardComponent *component = region.add_components();
+				std::cout << "2" << cur_size << std::endl;
 				component->set_file_path(mapRes_it->file_path());
+				std::cout << "3" << cur_size << std::endl;
 				component->set_start(start_line);
+				std::cout << "4" << cur_size << std::endl;
 				component->set_size(cur_size);
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
 
 				region_id++;
+				std::cout << "5" << cur_size << std::endl;
 				executeReduce(region);
+				std::cout << "6" << cur_size << std::endl;
 			}
 		}
 
-		// if (cur_size > 0) {
-		// 	std::cout << "Found a shard of size: " << cur_size << std::endl;
-		// 	masterworker::Shard region;
-		// 	region.set_id(region_id);
-		// 	masterworker::ShardComponent *component = region.add_components();
-		// 	component->set_file_path(mapRes_it->file_path());
-		// 	component->set_start(start_line);
-		// 	component->set_size(cur_size);
-		//
-		// 	region_id++;
-		// 	executeReduce(region);
-		// }
+		if (cur_size > 0) {
+			std::cout << "Found a shard of size: " << cur_size << std::endl;
+			masterworker::Shard region;
+			region.set_id(region_id);
+			masterworker::ShardComponent *component = region.add_components();
+			component->set_file_path(mapRes_it->file_path());
+			component->set_start(start_line);
+			component->set_size(cur_size);
+
+			region_id++;
+			executeReduce(region);
+		}
 
 		// clear for next file
 		start_line = 0;
