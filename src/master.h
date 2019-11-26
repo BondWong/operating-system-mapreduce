@@ -173,7 +173,7 @@ bool Master::run() {
 				cur_size = 0;
 
 				region_id++;
-				// executeReduce(region);
+				executeReduce(region);
 			}
 			cur_size++;
 			line_cnt++;
@@ -189,7 +189,7 @@ bool Master::run() {
 			component->set_size(line_cnt - start_line);
 
 			region_id++;
-			// executeReduce(region);
+			executeReduce(region);
 		}
 
 		// clear for next file
