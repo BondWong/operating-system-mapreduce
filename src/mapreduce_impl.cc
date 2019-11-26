@@ -12,10 +12,10 @@ bool MapReduceImpl::run(const std::string& config_filename) {
         return false;
     }
 
-    // if(!create_shards()) {
-    //     std::cerr << "Failed to create shards." << std::endl;
-    //     return false;
-    // }
+    if(!create_shards()) {
+        std::cerr << "Failed to create shards." << std::endl;
+        return false;
+    }
 
     // if(!run_master()) {
     //     std::cerr << "MapReduce failure. Something didn't go well!" << std::endl;

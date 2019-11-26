@@ -18,6 +18,12 @@ struct FileShard {
 	std::vector<ShardComponent> components;
 };
 
+inline void print_component(const ShardComponent* component) {
+	std::cout << "file_path=" << component.file_path << std::endl;
+	std::cout << "start=" << component.start << std::endl;
+	std::cout << "size=" << component.size << std::endl;
+}
+
 /* CS6210_TASK: Create fileshards from the list of input files, map_kilobytes etc. using mr_spec you populated  */
 inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fileShards) {
 	int shard_size = mr_spec.map_kilobytes * 1024;
@@ -49,6 +55,8 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 				cur_size = 0;
 				fileshard_id++;
 				cur_shard = new FileShard;
+
+				print_component(component);
 			}
 
 			cur_size += line.length();
@@ -62,6 +70,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		component->size = line_cnt;
 		cur_shard->components.push_back(*component);
 
+		print_component(component);
 		// handle next file
 		it++;
 	}
