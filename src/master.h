@@ -52,7 +52,7 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
  	: mr_spec(mr_spec), file_shards(file_shards) {
 	workerPool = new WorkerPool(mr_spec.worker_ipaddr_ports);
 	mapRepDaemonThread = std::thread(&Master::asyncCompleteRpcMap, this);
-	mapRepDaemonThread = std::thread(&Master::asyncCompleteRpcReduce, this);
+	reduceRepDaemonThread = std::thread(&Master::asyncCompleteRpcReduce, this);
 }
 
 // const masterworker::Shard& shard, masterworker::Result* res
