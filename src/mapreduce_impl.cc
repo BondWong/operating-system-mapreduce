@@ -6,21 +6,21 @@
 
 /* DON'T touch this function */
 bool MapReduceImpl::run(const std::string& config_filename) {
-    
+
     if(!read_and_validate_spec(config_filename)) {
         std::cerr << "Spec not configured properly." << std::endl;
         return false;
     }
 
-    if(!create_shards()) {
-        std::cerr << "Failed to create shards." << std::endl;
-        return false;
-    }
+    // if(!create_shards()) {
+    //     std::cerr << "Failed to create shards." << std::endl;
+    //     return false;
+    // }
 
-    if(!run_master()) {
-        std::cerr << "MapReduce failure. Something didn't go well!" << std::endl;
-        return false;
-    }
+    // if(!run_master()) {
+    //     std::cerr << "MapReduce failure. Something didn't go well!" << std::endl;
+    //     return false;
+    // }
 
     return true;
 }
