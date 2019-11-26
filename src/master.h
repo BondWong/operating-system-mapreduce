@@ -35,6 +35,7 @@ class Master {
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
 		std::vector<masterworker::Result> mapResults;
+		std::vector<std::string> statuses;
 
 		void executeMap(const masterworker::Shard& shard);
 		void asyncCompleteRpcMap();
@@ -72,9 +73,11 @@ void Master::asyncCompleteRpcMap() {
 		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 		GPR_ASSERT(ok);
 		if (!call->status.ok()) {
+			statuses.push_back("no");
 			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
 			return;
 		}
+		statuses.push_back("ok");
 		std::string worker = call->res.worker_ipaddr_port();
 		workerPool->release_worker(worker);
 		mapResults.push_back(call->res);
@@ -129,10 +132,12 @@ bool Master::run() {
 	int mapRes_cnt = 0;
 	while (mapRes_cnt != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		mapRes_cnt = mapResults.size();
-		for (int i = 0; i < mapRes_cnt; i++) {
-			std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
-		}
+		status_cnt = statuses.size();
+		for (int i = 0; i < status_cnt; i++) std::cout << status_cnt.at(i) << std::endl;
+		// mapRes_cnt = mapResults.size();
+		// for (int i = 0; i < mapRes_cnt; i++) {
+		// 	std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
+		// }
 		std::cout << std::endl;
 	}
 
