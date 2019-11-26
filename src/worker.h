@@ -77,7 +77,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			res->set_file_path(output_filepath);
 
 			std::cout << "Worker-map: " << ip_addr_port << " done working on shard: " << shard->id() << std::endl;
-			std::cout << "Worker-map: " << ip_addr_port << " output file: " << output_filepath << std::endl;
+			std::cout << "Worker-map: " << res->worker_ipaddr_port() << " output file: " << res->file_path() << std::endl;
 
 			return grpc::Status::OK;
 		}
