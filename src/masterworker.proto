@@ -3,8 +3,8 @@ syntax = "proto3";
 package masterworker;
 
 service WorkerService {
-  rpc map(Shard) returns (Result) {}
-  rpc reduce(Region) returns (Result) {}
+  rpc Map(Shard) returns (Result) {}
+  rpc Reduce(Region) returns (Result) {}
 }
 
 message ShardComponent {
