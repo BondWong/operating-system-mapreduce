@@ -126,25 +126,26 @@ bool Master::run() {
 	}
 
 	// block till all map jobs finished
-	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(5));
+	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	int total_line_cnt = 0;
-	std::vector<masterworker::Result>::const_iterator mapRes_it;
-	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
-		const std::string& file_path = mapRes_it->file_path();
-		std::ifstream interm_file(file_path);
-	  total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
+	while (total_line_cnt == 0) {
+		std::vector<masterworker::Result>::const_iterator mapRes_it;
+		for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
+			const std::string& file_path = mapRes_it->file_path();
+			std::ifstream interm_file(file_path);
+		  total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
+		}
 	}
-
 	std::cout << "total line: " << total_line_cnt << std::endl;
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 0;
 	int region_size = total_line_cnt / (mr_spec.n_output_files - 1);
-	int remain = total_line_cnt % (mr_spec.n_output_files - 1);
 	int cur_size = 0;
 	int start_line = 0;
 	int line_cnt = 0;
+	std::vector<masterworker::Shard> region;
 
 	mapRes_it = mapResults.begin();
 	while (mapRes_it != mapResults.end()) {
@@ -172,17 +173,14 @@ bool Master::run() {
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
-
 				region_id++;
-				executeReduce(region);
+				regions.push_back(region);
 			}
 		}
 
 		if (cur_size > 0) {
 			std::cout << "Found a shard of size: " << cur_size << std::endl;
-			masterworker::Shard region;
-			region.set_id(region_id);
-			std::cout << "1" << std::endl;
+			masterworker::Shard& region = regions.back();
 			masterworker::ShardComponent *component = region.add_components();
 			std::cout << "2" << std::endl;
 			component->set_file_path(file_path);
@@ -190,11 +188,7 @@ bool Master::run() {
 			component->set_start(start_line);
 			std::cout << "4" << std::endl;
 			component->set_size(cur_size);
-
 			region_id++;
-			std::cout << "5" << std::endl;
-			executeReduce(region);
-			std::cout << "6" << std::endl;
 		}
 
 		// clear for next file
@@ -204,6 +198,8 @@ bool Master::run() {
 		// handle next file
 		mapRes_it++;
 	}
+
+	for (masterworker::Shard& region: regions) executeReduce(region);
 
 	// block till all reduce jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
