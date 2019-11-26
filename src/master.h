@@ -165,22 +165,16 @@ bool Master::run() {
 				std::cout << "Found a shard of size: " << cur_size << std::endl;
 				masterworker::Shard region;
 				region.set_id(region_id);
-				std::cout << "1" << std::endl;
 				masterworker::ShardComponent *component = region.add_components();
-				std::cout << "2" << std::endl;
 				component->set_file_path(file_path);
-				std::cout << "3" << std::endl;
 				component->set_start(start_line);
-				std::cout << "4" << std::endl;
 				component->set_size(cur_size);
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
 
 				region_id++;
-				std::cout << "5" << std::endl;
 				executeReduce(region);
-				std::cout << "6" << std::endl;
 			}
 		}
 
@@ -188,13 +182,19 @@ bool Master::run() {
 			std::cout << "Found a shard of size: " << cur_size << std::endl;
 			masterworker::Shard region;
 			region.set_id(region_id);
+			std::cout << "1" << std::endl;
 			masterworker::ShardComponent *component = region.add_components();
+			std::cout << "2" << std::endl;
 			component->set_file_path(file_path);
+			std::cout << "3" << std::endl;
 			component->set_start(start_line);
+			std::cout << "4" << std::endl;
 			component->set_size(cur_size);
 
 			region_id++;
+			std::cout << "5" << std::endl;
 			executeReduce(region);
+			std::cout << "6" << std::endl;
 		}
 
 		// clear for next file
