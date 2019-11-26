@@ -4,7 +4,7 @@ package masterworker;
 
 service WorkerService {
   rpc Map(Shard) returns (Result) {}
-  rpc Reduce(Region) returns (Result) {}
+  rpc Reduce(Shard) returns (Result) {}
 }
 
 message ShardComponent {
@@ -16,11 +16,6 @@ message ShardComponent {
 message Shard {
   int32 id = 1;
   repeated ShardComponent components = 2;
-}
-
-message Region {
-  int32 id = 1;
-  repeated string file_paths = 2;
 }
 
 message Result {

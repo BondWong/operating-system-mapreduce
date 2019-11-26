@@ -41,9 +41,9 @@ class Master {
 		void asyncCompleteRpcMap();
 		std::thread mapRepDaemonThread;
 
-		// std::thread executeReduce(const masterworker::Region& region);
-		// void asyncCompleteRpcReduce();
-		// std::thread reduceRepDaemonThread;
+		std::thread executeReduce(const masterworker::Shard& region);
+		void asyncCompleteRpcReduce();
+		std::thread reduceRepDaemonThread;
 };
 
 /* CS6210_TASK: This is all the information your master will get from the framework.
@@ -52,6 +52,7 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
  	: mr_spec(mr_spec), file_shards(file_shards) {
 	workerPool = new WorkerPool(mr_spec.worker_ipaddr_ports);
 	mapRepDaemonThread = std::thread(&Master::asyncCompleteRpcMap, this);
+	mapRepDaemonThread = std::thread(&Master::asyncCompleteRpcReduce, this);
 }
 
 // const masterworker::Shard& shard, masterworker::Result* res
@@ -82,6 +83,23 @@ void Master::asyncCompleteRpcMap() {
 	}
 }
 
+void Master::asyncCompleteRpcReduce() {
+	void *got_tag;
+	bool ok = false;
+	// wait for the next available response
+	while (cq.Next(&got_tag, &ok)) {
+		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
+		GPR_ASSERT(ok);
+		if (!call->status.ok()) {
+			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
+			return;
+		}
+		std::string worker = call->res.worker_ipaddr_port();
+		workerPool->release_worker(worker);
+		delete call;
+	}
+}
+
 /* CS6210_TASK: Here you go. once this function is called you will complete whole map reduce task and return true if succeeded */
 bool Master::run() {
 	// do map works with blocking queue, thread pool idea from my last assignment
@@ -105,33 +123,70 @@ bool Master::run() {
 		std::cout << it->file_path() << std::endl;
 	}
 
-	// // do reduce works with blocking queue, thread pool idea from my last assignment
-	// int region_id = 1;
-	// int region_size = results.size() / mr_spec.n_output_files == 0
-	// 	? results.size()
-	// 	: results.size() / mr_spec.n_output_files;
-	// std::vector<std::thread> reduceThreads;
-	// int i = 0;
-	// while (i < results.size()) {
-	// 	int j = i;
-	// 	masterworker::Region region;
-	// 	region.set_id(region_id++);
-	// 	while (j < results.size() && j < region_size) {
-	// 		region.add_file_paths(results.at(i).file_path());
-	// 		j++;
-	// 	}
-	//
-	// 	masterworker::Result res;
-	// 	reduceThreads.push_back(workerPool->executeReduce(region, &res));
-	// 	i = j;
-	// }
-	//
-	// // block till all reduce jobs finished
-	// for (auto& t: reduceThreads) t.join();
+	int total_line_cnt = 0;
+	std::vector<masterworker::Result>::const_iterator mapRes_it;
+	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
+		std::ifstream interm_file(mapRes_it->file_path());
+	  total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
+	}
+
+	std::cout << "total line: " << total_line_cnt << std::endl;
+
+	// do reduce works with blocking queue, thread pool idea from my last assignment
+	int region_id = 0;
+	int region_size = total_line_cnt / mr_spec.n_output_files;
+	int remain = total_line_cnt % mr_spec.n_output_files;
+	int last_region_size = region_size + remain;
+	int cur_size = 0;
+	int start_line = 0;
+	int line_cnt = 0;
+	int region_cnt = 0;
+
+	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
+		std::ifstream interm_file(mapRes_it->file_path());
+		if (!interm_file.is_open()) {
+			std::cerr << "Error when opening file: " << *mapRes_it << std::endl;
+			return false;
+		}
+
+		std::string line;
+		while (std::getline(interm_file, line)) {
+			// find a shard
+			if ((region_cnt != mr_spec.n_output_files - 1 && cur_size == region_size - 1) ||
+				region_cnt == mr_spec.n_output_files - 1 && cur_size == last_region_size - 1) {
+				std::cout << "Found a shard of size: " << cur_size << std::endl;
+				masterworker::Shard region;
+				region.set_id(region_id);
+				masterworker::ShardComponent *component = region.add_components();
+				component->set_file_path(*mapRes_it);
+				component->set_start(start_line);
+				component->set_size(line_cnt - start_line);
+				// clear for next shard
+				start_line = line_cnt;
+				cur_size = 0;
+				region_id++;
+
+				executeReduce(region);
+				region_cnt++;
+			}
+			cur_size++;
+			line_cnt++;
+		}
+
+		// clear for next file
+		start_line = 0;
+		line_cnt = 0;
+
+		// handle next file
+		it++;
+	}
+
+	// block till all reduce jobs finished
+	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	std::cout << "Press control-c to quit" << std::endl << std::endl;
   mapRepDaemonThread.join();  //blocks forever
-	// reduceRepDaemonThread.join();  //blocks forever
+	reduceRepDaemonThread.join();  //blocks forever
 
 	return true;
 }

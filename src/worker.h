@@ -52,17 +52,13 @@ class Worker final: public masterworker::WorkerService::Service {
 
 				std::string line;
 				// loop to the starting line
-				std::cout << "loop~" << std::endl;
 				for (int j = 0; j < start; j++) std::getline(source_file, line);
-				std::cout << "work~" << std::endl;
 				for (int j = start; j < size; j++) {
 					std::getline(source_file, line);
 					mapper->map(line);
 				}
-				std::cout << "done work~" << std::endl;
 			}
 
-			std::cout << "hi~" << std::endl;
 			std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
 			sort(key_vals.begin(), key_vals.end());
 
@@ -74,17 +70,15 @@ class Worker final: public masterworker::WorkerService::Service {
 					"Error when opening an output file for map function: " + output_filepath);
 			}
 
-			std::cout << "hey~" << std::endl;
 			std::vector<std::pair<std::string, std::string> >::iterator it;
 			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
 
-			std::cout << "hello~" << std::endl;
 			res->set_worker_ipaddr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 			return grpc::Status::OK;
 		}
 
-		grpc::Status Reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
+		grpc::Status Reduce(grpc::ServerContext* ctx, const masterworker::Shard* region, masterworker::Result* res) override {
 			std::cout << "I am worker " << ip_addr_port << std::endl;
 			auto reducer = get_reducer_from_task_factory("cs6210");
 
