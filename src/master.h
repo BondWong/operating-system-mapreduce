@@ -172,11 +172,9 @@ bool Master::run() {
 				cur_size = 0;
 
 				region_id++;
-				executeReduce(region);
+				// executeReduce(region);
 			}
 		}
-
-		std::cout << "heyhey~" << std::endl;
 
 		if (cur_size > 0) {
 			std::cout << "Found a shard of size: " << cur_size << std::endl;
@@ -188,10 +186,8 @@ bool Master::run() {
 			component->set_size(line_cnt - start_line);
 
 			region_id++;
-			executeReduce(region);
+			// executeReduce(region);
 		}
-
-		std::cout << "hihi~" << std::endl;
 
 		// clear for next file
 		start_line = 0;
