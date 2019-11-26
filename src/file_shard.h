@@ -92,5 +92,8 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		it++;
 	}
 
+	// handle the incomplete shard
+	if (!cur_shard->components.empty()) fileShards.push_back(*cur_shard);
+
 	return true;
 }
