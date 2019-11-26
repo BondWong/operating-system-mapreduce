@@ -54,6 +54,7 @@ void WorkerPool::release_worker(const std::string& worker_ipaddr_port) {
 	free_worker_queue.push(worker_ipaddr_port);
 	std::cout << "pool release: " << worker_ipaddr_port << std::endl;
 	lock.unlock();
+	condition.notify_one();
 }
 
 bool WorkerPool::done() {
