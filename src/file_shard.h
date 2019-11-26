@@ -52,7 +52,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 				ShardComponent* component = new ShardComponent;
 				component->file_path = *it;
 				component->start = start_line;
-				component->size = line_cnt;
+				component->size = line_cnt - start_line;
 				cur_shard->components.push_back(*component);
 				fileShards.push_back(*cur_shard);
 
@@ -78,7 +78,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 			ShardComponent* component = new ShardComponent;
 			component->file_path = *it;
 			component->start = start_line;
-			component->size = line_cnt;
+			component->size = line_cnt - start_line;
 			cur_shard->components.push_back(*component);
 
 			print_component(component);
