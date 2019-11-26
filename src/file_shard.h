@@ -48,7 +48,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		while (std::getline(intput_file, line)) {
 			// find a component
 			if (cur_size + line.length() > shard_size) {
-				std::cout << "Found a component" << std::endl;
+				std::cout << "Found a component of size: " << cur_size << std::endl;
 				ShardComponent* component;
 				component->file_path = *it;
 				component->start = start_line;
@@ -72,7 +72,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 
 		// handle remaining
 		if (cur_size > 0) {
-			std::cout << "Hanle remaining component" << std::endl;
+			std::cout << "Hanle remaining component of size: " << cur_size << std::endl;
 			ShardComponent* component;
 			component->file_path = *it;
 			component->start = start_line;
