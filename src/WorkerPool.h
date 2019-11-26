@@ -35,8 +35,7 @@ WorkerPool::WorkerPool(const std::vector<std::string>& worker_ipaddr_ports) {
 		std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel(worker_ipaddr_port,
 			grpc::InsecureChannelCredentials());
 		std::unique_ptr<masterworker::WorkerService::Stub> stub(masterworker::WorkerService::NewStub(channel));
-		std::pair<std::string, std::unique_ptr<masterworker::WorkerService::Stub> > p(worker_ipaddr_port, stub);
-		workers.insert(p);
+		workers.insert(std::pair<std::string, std::unique_ptr<masterworker::WorkerService::Stub> >(worker_ipaddr_port, stub));
 		free_worker_queue.push(worker_ipaddr_port);
 	}
 }
@@ -47,7 +46,7 @@ std::thread WorkerPool::executeMap(const masterworker::Shard* shard, masterworke
 		std::unique_ptr<masterworker::WorkerService::Stub>& stub_ = workers.at(worker);
 		grpc::ClientContext context;
 		masterworker::Result res;
-		grpc::Status status = stub_.map(&context, &shard, &res);
+		grpc::Status status = stub_->map(&context, &shard, &res);
 		if (!status.ok()) std::cerr << status.error_message() << std::endl;
 		release_worker(worker);
 	};
@@ -62,7 +61,7 @@ std::thread WorkerPool::executeReduce(const masterworker::Region* region, master
 		std::unique_ptr<masterworker::WorkerService::Stub>& stub_ = workers.at(worker);
 		grpc::ClientContext context;
 		masterworker::Result res;
-		grpc::Status status = stub_.reduce(&context, &region, &res);
+		grpc::Status status = stub_->reduce(&context, &region, &res);
 		if (!status.ok()) std::cerr << status.error_message() << std::endl;
 		release_worker(worker);
 	};
