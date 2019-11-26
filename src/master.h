@@ -143,13 +143,11 @@ bool Master::run() {
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 0;
-	int region_size = total_line_cnt / mr_spec.n_output_files;
-	int remain = total_line_cnt % mr_spec.n_output_files;
-	int last_region_size = region_size + remain;
+	int region_size = total_line_cnt / (mr_spec.n_output_files - 1);
+	int remain = total_line_cnt % (mr_spec.n_output_files - 1);
 	int cur_size = 0;
 	int start_line = 0;
 	int line_cnt = 0;
-	int region_cnt = 0;
 
 	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
 		std::ifstream interm_file(mapRes_it->file_path());
@@ -161,8 +159,7 @@ bool Master::run() {
 		std::string line;
 		while (std::getline(interm_file, line)) {
 			// find a shard
-			if ((region_cnt != mr_spec.n_output_files - 1 && cur_size == region_size - 1) ||
-				region_cnt == mr_spec.n_output_files - 1 && cur_size == last_region_size - 1) {
+			if (cur_size == region_size - 1)) {
 				std::cout << "Found a shard of size: " << cur_size << std::endl;
 				masterworker::Shard region;
 				region.set_id(region_id);
@@ -173,13 +170,25 @@ bool Master::run() {
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
-				region_id++;
 
+				region_id++;
 				// executeReduce(region);
-				region_cnt++;
 			}
 			cur_size++;
 			line_cnt++;
+		}
+
+		if (cur_size > 0) {
+			std::cout << "Found a shard of size: " << cur_size << std::endl;
+			masterworker::Shard region;
+			region.set_id(region_id);
+			masterworker::ShardComponent *component = region.add_components();
+			component->set_file_path(mapRes_it->file_path());
+			component->set_start(start_line);
+			component->set_size(line_cnt - start_line);
+
+			region_id++;
+			// executeReduce(region);
 		}
 
 		// clear for next file
