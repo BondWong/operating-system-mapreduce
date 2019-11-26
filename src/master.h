@@ -23,7 +23,7 @@ class Master {
 
 	private:
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
-		WorkerPool workerPool;
+		WorkerPool* workerPool;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
 
@@ -56,7 +56,7 @@ bool Master::run() {
 		}
 
 		masterworker::Result res;
-		threads.push_back(workerPool.executeMap(shard, &res));
+		threads.push_back(workerPool->executeMap(shard, &res));
 		results.push_back(res);
 	}
 
@@ -78,7 +78,7 @@ bool Master::run() {
 		}
 
 		masterworker::Result res;
-		reduceThreads.push_back(workerPool.executeReduce(region, &res));
+		reduceThreads.push_back(workerPool->executeReduce(region, &res));
 		i = j;
 	}
 
