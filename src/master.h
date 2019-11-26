@@ -31,6 +31,7 @@ class Master {
 		};
 
 		WorkerPool* workerPool;
+		std::mutex mutex;
 		grpc::CompletionQueue cq;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
@@ -99,7 +100,7 @@ bool Master::run() {
 	}
 
 	// block till all map jobs finished
-	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(5));
+	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
 	for (std::vector<masterworker::Result>::const_iterator it = mapResults.begin(); it != mapResults.end(); it++) {
 		std::cout << it->file_path() << std::endl;
 	}
@@ -127,6 +128,10 @@ bool Master::run() {
 	//
 	// // block till all reduce jobs finished
 	// for (auto& t: reduceThreads) t.join();
+
+	std::cout << "Press control-c to quit" << std::endl << std::endl;
+  mapRepDaemonThread.join();  //blocks forever
+	// reduceRepDaemonThread.join();  //blocks forever
 
 	return true;
 }
