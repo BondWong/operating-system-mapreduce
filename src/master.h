@@ -131,14 +131,14 @@ bool Master::run() {
 	int total_line_cnt = 0;
 	std::vector<masterworker::Result>::const_iterator mapRes_it;
 	while (total_line_cnt == 0) {
-		std::vector<masterworker::Result>::const_iterator mapRes_it;
-		for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
+		for (std::vector<masterworker::Result>::const_iterator mapRes_it = mapResults.begin();
+			mapRes_it != mapResults.end(); mapRes_it++) {
 			const std::string& file_path = mapRes_it->file_path();
 			std::ifstream interm_file(file_path);
 		  total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 		}
+		std::cout << "total line: " << total_line_cnt << std::endl;
 	}
-	std::cout << "total line: " << total_line_cnt << std::endl;
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 0;
@@ -189,7 +189,6 @@ bool Master::run() {
 			component->set_start(start_line);
 			std::cout << "4" << std::endl;
 			component->set_size(cur_size);
-			region_id++;
 		}
 
 		// clear for next file
