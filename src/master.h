@@ -41,7 +41,7 @@ class Master {
 		void asyncCompleteRpcMap();
 		std::thread mapRepDaemonThread;
 
-		std::thread executeReduce(const masterworker::Shard& region);
+		void executeReduce(const masterworker::Shard& region);
 		void asyncCompleteRpcReduce();
 		std::thread reduceRepDaemonThread;
 };
