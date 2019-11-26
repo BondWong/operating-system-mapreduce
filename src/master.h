@@ -145,7 +145,7 @@ bool Master::run() {
 	for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
 		std::ifstream interm_file(mapRes_it->file_path());
 		if (!interm_file.is_open()) {
-			std::cerr << "Error when opening file: " << *mapRes_it << std::endl;
+			std::cerr << "Error when opening file: " << mapRes_it->file_path() << std::endl;
 			return false;
 		}
 
