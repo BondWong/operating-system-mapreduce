@@ -23,8 +23,15 @@ class Master {
 
 	private:
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
+		struct AsyncClientCall {
+			grpc::ClientContext context;
+			Status status;
+			masterworker::Result res;
+			std::unique_ptr<ClientAsyncResponseReader<InterimFile> > response_reader;
+		}
+
 		WorkerPool* workerPool;
-		CompletionQueue cq;
+		grpc::CompletionQueue cq;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
 		std::vector<masterworker::Result> mapResults;
@@ -49,8 +56,8 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 // const masterworker::Shard& shard, masterworker::Result* res
 
 void Master::executeMap(const masterworker::Shard& shard) {
-	// idea from this link https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/greeter_async_client2.cc#L54
-	grpc::AsyncClientCall *call = new grpc::AsyncClientCall;
+	// idea from this link https://github.com/grpc/grpc/blob/master/examples/cpp/helloworld/greeter_async_client2.cc#L101
+	AsyncClientCall* call = new AsyncClientCall;
 	std::unique_ptr<masterworker::WorkerService::Stub>& stub_= workerPool->get_worker_stub();
 	call->response_reader = stub_->AsyncMap(&call->context, shard, &cq);
 	call->response_reader->Finish(&call->reply, &call->status, (void*) call);
