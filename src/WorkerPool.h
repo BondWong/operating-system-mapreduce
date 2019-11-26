@@ -45,8 +45,9 @@ std::thread WorkerPool::executeMap(const masterworker::Shard& shard, masterworke
 		std::string worker = get_worker();
 		std::unique_ptr<masterworker::WorkerService::Stub>& stub_ = workers.at(worker);
 		grpc::ClientContext context;
-		std::cout << "making map call to worker: " << worker << std::endl;
+		if (stub_) std::cout << "stub_ is not null" << std::endl;
 		grpc::Status status = stub_->map(&context, shard, res);
+		std::cout << "making map call to worker: " << worker << std::endl;
 		if (!status.ok()) std::cerr << status.error_message() << std::endl;
 		std::cout << "done map call to worker with res: " << res->file_path() << std::endl;
 		release_worker(worker);
