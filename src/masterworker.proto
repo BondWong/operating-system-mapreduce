@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package masterworker;
 
-service MapReduceWorkerService {
+service WorkerService {
   rpc map(Shard) returns (Result) {}
   rpc reduce(Region) returns (Result) {}
 }

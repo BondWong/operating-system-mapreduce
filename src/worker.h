@@ -17,7 +17,7 @@ extern std::shared_ptr<BaseReducer> get_reducer_from_task_factory(const std::str
 	This is a big task for this project, will test your understanding of map reduce */
 
 // the idea of creating a service is based on this link https://grpc.io/docs/tutorials/basic/cpp/
-class Worker final: public masterworker::MapReduceWorkerService::Service {
+class Worker final: public masterworker::WorkerService::Service {
 
 	public:
 		/* DON'T change the function signature of this constructor */
