@@ -32,7 +32,7 @@ class Worker final: public masterworker::WorkerService::Service {
 		std::string ip_addr_port;
 
 		grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
-			res->file_path = "hi~";
+			res->set_file_path("hi~");
 			std::cout << "I am worker " << ip_addr_port << std::endl;
 			return grpc::Status::OK;
 		}
