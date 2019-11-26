@@ -131,6 +131,7 @@ bool Master::run() {
 
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 	int mapRes_cnt = 0;
 	while (mapRes_cnt != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
