@@ -145,7 +145,6 @@ bool Master::run() {
 		std::ifstream interm_file(file_path);
 		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 	}
-	std::cout << "total line: " << total_line_cnt << std::endl;
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 0;
@@ -190,11 +189,8 @@ bool Master::run() {
 			std::cout << "Found a shard of size: " << cur_size << std::endl;
 			masterworker::Shard& region = regions.back();
 			masterworker::ShardComponent *component = region.add_components();
-			std::cout << "2" << std::endl;
 			component->set_file_path(file_path);
-			std::cout << "3" << std::endl;
 			component->set_start(start_line);
-			std::cout << "4" << std::endl;
 			component->set_size(cur_size);
 		}
 
