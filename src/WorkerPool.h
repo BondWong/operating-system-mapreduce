@@ -35,7 +35,7 @@ WorkerPool::WorkerPool(const std::vector<std::string>& worker_ipaddr_ports) {
 		std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel(worker_ipaddr_port,
 			grpc::InsecureChannelCredentials());
 		std::unique_ptr<masterworker::MapReduceWorkerService::Stub> stub(masterworker::MapReduceWorkerService::NewStub(channel));
-		std::pair<std::string, std::unique_ptr<masterworker::MapReduceWorkerService::Stub> > (worker_ipaddr_port, stub);
+		std::pair<std::string, std::unique_ptr<masterworker::MapReduceWorkerService::Stub> > p(worker_ipaddr_port, stub);
 		workers.insert(p);
 		free_worker_queue.push(worker_ipaddr_port);
 	}

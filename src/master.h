@@ -47,9 +47,9 @@ bool Master::run() {
 	for (it = file_shards.begin(); it != file_shards.end(); it++) {
 		masterworker::Shard shard;
 		shard.set_id(it->id);
-		std::vector<ShardComponent>::const_iterator component_it;
+		std::vector<masterworker::ShardComponent>::const_iterator component_it;
 		for (component_it = it->components.begin(); component_it != it->components.end(); component_it++) {
-			ShardComponent *component = shard.add_components();
+			masterworker::ShardComponent *component = shard.add_components();
 			component->set_file_path((*component_it).file_path);
 			component->set_start((*component_it).start);
 			component->set_size((*component_it).size);
