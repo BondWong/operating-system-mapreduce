@@ -63,29 +63,29 @@ bool Master::run() {
 	// block till all map jobs finished
 	for (auto& t: threads) t.join();
 
-	// do reduce works with blocking queue, thread pool idea from my last assignment
-	int region_id = 1;
-	int region_size = results.size() / mr_spec.n_output_files == 0
-		? results.size()
-		: results.size() / mr_spec.n_output_files;
-	std::vector<std::thread> reduceThreads;
-	int i = 0;
-	while (i < results.size()) {
-		int j = i;
-		masterworker::Region region;
-		region.set_id(region_id++);
-		while (j < results.size() && j < region_size) {
-			region.add_file_paths(results.at(i).file_path());
-			j++;
-		}
-
-		masterworker::Result res;
-		reduceThreads.push_back(workerPool->executeReduce(region, &res));
-		i = j;
-	}
-
-	// block till all reduce jobs finished
-	for (auto& t: reduceThreads) t.join();
+	// // do reduce works with blocking queue, thread pool idea from my last assignment
+	// int region_id = 1;
+	// int region_size = results.size() / mr_spec.n_output_files == 0
+	// 	? results.size()
+	// 	: results.size() / mr_spec.n_output_files;
+	// std::vector<std::thread> reduceThreads;
+	// int i = 0;
+	// while (i < results.size()) {
+	// 	int j = i;
+	// 	masterworker::Region region;
+	// 	region.set_id(region_id++);
+	// 	while (j < results.size() && j < region_size) {
+	// 		region.add_file_paths(results.at(i).file_path());
+	// 		j++;
+	// 	}
+	//
+	// 	masterworker::Result res;
+	// 	reduceThreads.push_back(workerPool->executeReduce(region, &res));
+	// 	i = j;
+	// }
+	//
+	// // block till all reduce jobs finished
+	// for (auto& t: reduceThreads) t.join();
 
 	return true;
 }

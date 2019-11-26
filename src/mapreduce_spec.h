@@ -79,16 +79,16 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 /* CS6210_TASK: validate the specification read from the config file */
 inline bool validate_mr_spec(const MapReduceSpec& mr_spec) {
 	// debug
-	std::cout << "user_id=" << mr_spec.user_id <<std::endl;
-	std::cout << "n_workers=" << mr_spec.n_workers <<std::endl;
-	std::cout << "worker_ipaddr_ports=";
-	for (auto i = mr_spec.worker_ipaddr_ports.begin(); i != mr_spec.worker_ipaddr_ports.end(); i++) std::cout << *i << ' ';
-	std::cout << std::endl;
-	std::cout << "input_files=";
-	for (auto i = mr_spec.input_files.begin(); i != mr_spec.input_files.end(); i++) std::cout << *i << ' ';
-	std::cout << std::endl;
-	std::cout << "map_kilobytes=" << mr_spec.map_kilobytes <<std::endl;
-	std::cout << "n_output_files=" << mr_spec.n_output_files <<std::endl;
-	std::cout << "output_dir=" << mr_spec.output_dir <<std::endl;
+	// std::cout << "user_id=" << mr_spec.user_id <<std::endl;
+	// std::cout << "n_workers=" << mr_spec.n_workers <<std::endl;
+	// std::cout << "worker_ipaddr_ports=";
+	// for (auto i = mr_spec.worker_ipaddr_ports.begin(); i != mr_spec.worker_ipaddr_ports.end(); i++) std::cout << *i << ' ';
+	// std::cout << std::endl;
+	// std::cout << "input_files=";
+	// for (auto i = mr_spec.input_files.begin(); i != mr_spec.input_files.end(); i++) std::cout << *i << ' ';
+	// std::cout << std::endl;
+	// std::cout << "map_kilobytes=" << mr_spec.map_kilobytes <<std::endl;
+	// std::cout << "n_output_files=" << mr_spec.n_output_files <<std::endl;
+	// std::cout << "output_dir=" << mr_spec.output_dir <<std::endl;
 	return true;
 }
