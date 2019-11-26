@@ -133,8 +133,7 @@ bool Master::run() {
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 	while (mapFiles.size() != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		for (int i = 0; i < mapRes_cnt; i++) std::cout << mapFiles.at(i) << std::endl;
-		std::cout << std::endl;
+		std::cout << mapFiles.size() << std::endl;
 	}
 
 	int total_line_cnt = 0;
