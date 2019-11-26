@@ -43,7 +43,7 @@ bool Master::run() {
 	// do map works with blocking queue, thread pool idea from my last assignment
 	std::vector<FileShard>::const_iterator it;
 	std::vector<masterworker::Result> results;
-	std::vector<std::vector> threads;
+	std::vector<std::thread> threads;
 	for (it = file_shards.begin(); it != file_shards.end(); it++) {
 		masterworker::Shard shard;
 		shard.set_id(it->id);
@@ -67,7 +67,7 @@ bool Master::run() {
 	int region_id = 1;
 	int region_size = results.size() / mr_spec.n_output_files;
 	std::vector<masterworker::Result> reduceResults;
-	std::vector<std::vector> reduceThreads;
+	std::vector<std::thread> reduceThreads;
 	int i = 0;
 	while (i < results.size()) {
 		int j = i;
