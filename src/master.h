@@ -55,6 +55,8 @@ bool Master::run() {
 			component->set_size(component_it->size);
 		}
 
+		std::cout << "size: " << shard.components_size() << std::endl;
+
 		masterworker::Result res;
 		threads.push_back(workerPool->executeMap(shard, &res));
 		results.push_back(res);
