@@ -19,9 +19,9 @@ struct FileShard {
 };
 
 inline void print_component(const ShardComponent* component) {
-	std::cout << "file_path=" << component.file_path << std::endl;
-	std::cout << "start=" << component.start << std::endl;
-	std::cout << "size=" << component.size << std::endl;
+	std::cout << "file_path=" << component->file_path << std::endl;
+	std::cout << "start=" << component->start << std::endl;
+	std::cout << "size=" << component->size << std::endl;
 }
 
 /* CS6210_TASK: Create fileshards from the list of input files, map_kilobytes etc. using mr_spec you populated  */
