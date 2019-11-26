@@ -159,7 +159,7 @@ bool Master::run() {
 		std::string line;
 		while (std::getline(interm_file, line)) {
 			// find a shard
-			if (cur_size == region_size - 1)) {
+			if (cur_size == region_size - 1) {
 				std::cout << "Found a shard of size: " << cur_size << std::endl;
 				masterworker::Shard region;
 				region.set_id(region_id);
