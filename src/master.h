@@ -31,7 +31,6 @@ class Master {
 		};
 
 		WorkerPool* workerPool;
-		std::mutex mutex;
 		grpc::CompletionQueue cq;
 		const MapReduceSpec& mr_spec;
 		const std::vector<FileShard>& file_shards;
@@ -76,11 +75,9 @@ void Master::asyncCompleteRpcMap() {
 			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
 			return;
 		}
-		std::unique_lock<std::mutex> lock(mutex);
-		mapResults.push_back(call->res);
-		lock.unlock();
 		std::string worker = call->res.worker_ipaddr_port();
 		workerPool->release_worker(worker);
+		mapResults.push_back(call->res);
 		delete call;
 	}
 }
@@ -132,13 +129,11 @@ bool Master::run() {
 	int mapRes_cnt = 0;
 	while (mapRes_cnt != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		std::unique_lock<std::mutex> lock(mutex);
 		mapRes_cnt = mapResults.size();
 		for (int i = 0; i < mapRes_cnt; i++) {
 			std::cout << mapResults.at(i).file_path() + " " + mapResults.at(i).worker_ipaddr_port() << std::endl;
 		}
 		std::cout << std::endl;
-		lock.unlock();
 	}
 
 	int total_line_cnt = 0;
