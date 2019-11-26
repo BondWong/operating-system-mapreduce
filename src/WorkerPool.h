@@ -43,7 +43,7 @@ WorkerPool::WorkerPool(const std::vector<std::string>& worker_ipaddr_ports) {
 std::thread WorkerPool::executeMap(const masterworker::Shard& shard, masterworker::Result* res) {
 	std::function<void()> job = [&]() {
 		std::string worker = get_worker();
-		std::unique_ptr<masterworker::WorkerService::Stub> stub_ = workers.at(worker);
+		std::unique_ptr<masterworker::WorkerService::Stub>& stub_ = workers.at(worker);
 		grpc::ClientContext context;
 		grpc::Status status = stub_->Map(&context, shard, res);
 		std::cout << "making map call to worker: " << worker << std::endl;
