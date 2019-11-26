@@ -82,7 +82,7 @@ class Worker final: public masterworker::WorkerService::Service {
 		// 	for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
 		//
 		// 	std::cout << "hello~";
-		// 	res->set_worker_ip_addr_port(ip_addr_port);
+		// 	res->set_worker_ipaddr_port(ip_addr_port);
 		// 	res->set_file_path(output_filepath);
 		// 	return grpc::Status::OK;
 		// }
@@ -130,7 +130,7 @@ class Worker final: public masterworker::WorkerService::Service {
 			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << "=" << it->second << std::endl;
 			output_file.close();
 
-			res->set_worker_ip_addr_port(ip_addr_port);
+			res->set_worker_ipaddr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 
 			return grpc::Status::OK;

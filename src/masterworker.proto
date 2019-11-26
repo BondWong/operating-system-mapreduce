@@ -24,6 +24,6 @@ message Region {
 }
 
 message Result {
-  string worker_ip_addr_port = 1; // worker address as id
+  string worker_ipaddr_port = 1; // worker address as id
   string file_path = 2;
 }
