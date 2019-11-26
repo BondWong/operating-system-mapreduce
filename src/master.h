@@ -27,7 +27,7 @@ class Master {
 			grpc::ClientContext context;
 			Status status;
 			masterworker::Result res;
-			std::unique_ptr<ClientAsyncResponseReader<InterimFile> > response_reader;
+			std::unique_ptr<ClientAsyncResponseReader<masterworker::Result> > response_reader;
 		}
 
 		WorkerPool* workerPool;
@@ -60,7 +60,7 @@ void Master::executeMap(const masterworker::Shard& shard) {
 	AsyncClientCall* call = new AsyncClientCall;
 	std::unique_ptr<masterworker::WorkerService::Stub>& stub_= workerPool->get_worker_stub();
 	call->response_reader = stub_->AsyncMap(&call->context, shard, &cq);
-	call->response_reader->Finish(&call->reply, &call->status, (void*) call);
+	call->response_reader->Finish(&call->res, &call->status, (void*) call);
 }
 
 void Master::asyncCompleteRpcMap() {
@@ -74,8 +74,8 @@ void Master::asyncCompleteRpcMap() {
 			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
 			return;
 		}
-		workerPool.release_worker(call->reply.worker_ipaddr_port());
-		mapResults.push_back(*(call->reply));
+		workerPool.release_worker(call->res.worker_ipaddr_port());
+		mapResults.push_back(*(call->res));
 		delete call;
 	}
 }
