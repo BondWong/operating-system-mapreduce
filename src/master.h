@@ -132,7 +132,7 @@ bool Master::run() {
 	int mapRes_cnt = 0;
 	while (mapRes_cnt != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		status_cnt = statuses.size();
+		int status_cnt = statuses.size();
 		for (int i = 0; i < status_cnt; i++) std::cout << status_cnt.at(i) << std::endl;
 		// mapRes_cnt = mapResults.size();
 		// for (int i = 0; i < mapRes_cnt; i++) {
