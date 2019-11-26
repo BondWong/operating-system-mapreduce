@@ -79,7 +79,7 @@ void Master::asyncCompleteRpcMap() {
 		}
 		std::string worker = call->res.worker_ipaddr_port();
 		std::string fiel_path = call->res.file_path();
-		workerPool->release_worker(worker, fiel_path);
+		workerPool->release_worker(worker);
 		mapFiles.push_back(fiel_path);
 		delete call;
 	}
@@ -106,7 +106,7 @@ void Master::asyncCompleteRpcReduce() {
 			return;
 		}
 		std::string worker = call->res.worker_ipaddr_port();
-		workerPool->release_worker(worker, "hi");
+		workerPool->release_worker(worker);
 		delete call;
 	}
 }
@@ -131,18 +131,15 @@ bool Master::run() {
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
 	std::this_thread::sleep_for(std::chrono::seconds(10));
-	int mapRes_cnt = 0;
-	while (mapRes_cnt != file_shards.size()) {
+	while (mapFiles.size() != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		mapRes_cnt = mapFiles.size();
-		for (int i = 0; i < mapRes_cnt; i++) std::cout << mapFiles.at(i) + " " + mapFiles.at(i) << std::endl;
+		for (int i = 0; i < mapRes_cnt; i++) std::cout << mapFiles.at(i) << std::endl;
 		std::cout << std::endl;
 	}
 
 	int total_line_cnt = 0;
 	std::vector<std::string>::const_iterator mapRes_it;
-	for (std::vector<std::string>::const_iterator mapRes_it = mapFiles.begin();
-		mapRes_it != mapFiles.end(); mapRes_it++) {
+	for (mapRes_it = mapFiles.begin(); mapRes_it != mapFiles.end(); mapRes_it++) {
 		const std::string& file_path = *mapRes_it;
 		std::ifstream interm_file(file_path);
 		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
@@ -172,23 +169,32 @@ bool Master::run() {
 			line_cnt++;
 
 			if (cur_size == region_size) {
-				std::cout << "Found a shard of size: " << cur_size << std::endl;
+				std::cout << "Found a region of size: " << cur_size << std::endl;
+				std::cout << "1" <<std::endl;
 				masterworker::Shard region;
+				std::cout << "2" <<std::endl;
 				region.set_id(region_id);
+				std::cout << "3" <<std::endl;
 				masterworker::ShardComponent *component = region.add_components();
+				std::cout << "4" <<std::endl;
 				component->set_file_path(file_path);
+				std::cout << "5" <<std::endl;
 				component->set_start(start_line);
+				std::cout << "6" <<std::endl;
 				component->set_size(cur_size);
+				std::cout << "7" <<std::endl;
 				// clear for next shard
 				start_line = line_cnt;
 				cur_size = 0;
 				region_id++;
+				std::cout << "8" <<std::endl;
 				regions.push_back(region);
+				std::cout << "9" <<std::endl;
 			}
 		}
 
 		if (cur_size > 0) {
-			std::cout << "Found a shard of size: " << cur_size << std::endl;
+			std::cout << "Found a region of size: " << cur_size << std::endl;
 			masterworker::Shard& region = regions.back();
 			masterworker::ShardComponent *component = region.add_components();
 			component->set_file_path(file_path);

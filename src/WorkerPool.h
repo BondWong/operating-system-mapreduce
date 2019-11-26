@@ -19,7 +19,7 @@ public:
 	WorkerPool(const std::vector<std::string>& worker_ipaddr_ports);
 
 	std::unique_ptr<masterworker::WorkerService::Stub>& get_worker_stub();
-	void release_worker(const std::string& worker_ipaddr_port, const std::string& res);
+	void release_worker(const std::string& worker_ipaddr_port);
 	bool done();
 
 private:
@@ -50,27 +50,18 @@ std::unique_ptr<masterworker::WorkerService::Stub>& WorkerPool::get_worker_stub(
 	return stub_;
 }
 
-void WorkerPool::release_worker(const std::string& worker_ipaddr_port, const std::string& res) {
+void WorkerPool::release_worker(const std::string& worker_ipaddr_port) {
 	std::unique_lock<std::mutex> lock(mutex);
 	free_worker_queue.push(worker_ipaddr_port);
 	results.push_back(res);
 	condition.notify_one();
 	lock.unlock();
 	std::cout << "release worker: " << worker_ipaddr_port << std::endl;
-	std::cout << "result from release worker: " << res << std::endl;
 }
 
 bool WorkerPool::done() {
 	return size == free_worker_queue.size();
 }
-
-// std::vector<std::string> get_results() {
-// 	return results;
-// }
-//
-// void clear_results() {
-// 	results.clear();
-// }
 
 std::string WorkerPool::get_worker() {
 	std::unique_lock<std::mutex> lock(mutex);
