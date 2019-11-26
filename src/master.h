@@ -56,7 +56,7 @@ bool Master::run() {
 		}
 
 		masterworker::Result res;
-		threads.push_back(workerPool.executeMap(shard, res));
+		threads.push_back(workerPool.executeMap(&shard, &res));
 		results.push_back(res);
 	}
 
@@ -78,7 +78,7 @@ bool Master::run() {
 		}
 
 		masterworker::Result res;
-		reduceThreads.push_back(workerPool.executeReduce(region, res));
+		reduceThreads.push_back(workerPool.executeReduce(&region, &res));
 		i = j;
 	}
 
