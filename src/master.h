@@ -129,6 +129,7 @@ bool Master::run() {
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	int total_line_cnt = 0;
+	std::vector<masterworker::Result>::const_iterator mapRes_it;
 	while (total_line_cnt == 0) {
 		std::vector<masterworker::Result>::const_iterator mapRes_it;
 		for (mapRes_it = mapResults.begin(); mapRes_it != mapResults.end(); mapRes_it++) {
@@ -145,7 +146,7 @@ bool Master::run() {
 	int cur_size = 0;
 	int start_line = 0;
 	int line_cnt = 0;
-	std::vector<masterworker::Shard> region;
+	std::vector<masterworker::Shard> regions;
 
 	mapRes_it = mapResults.begin();
 	while (mapRes_it != mapResults.end()) {
