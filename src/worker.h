@@ -40,8 +40,8 @@ class Worker final: public masterworker::WorkerService::Service {
 				int start = comp.start();
 				int size = comp.size();
 
-				std::cout << "Worker " << ip_addr_port << ": file_path"
-					<< file_path << "-start" << start << "-size" << size << std::endl;
+				std::cout << "Worker " << ip_addr_port << ": "
+					<< file_path << "-" << start << "-" << size << std::endl;
 
 				std::ifstream source_file(file_path);
 				if (!source_file.is_open()) {
@@ -52,14 +52,17 @@ class Worker final: public masterworker::WorkerService::Service {
 
 				std::string line;
 				// loop to the starting line
+				std::cout << "loop~" << std::endl;
 				for (int j = 0; j < start; j++) std::getline(source_file, line);
+				std::cout << "work~" << std::endl;
 				for (int j = start; j < size; j++) {
 					std::getline(source_file, line);
 					mapper->map(line);
 				}
+				std::cout << "done work~" << std::endl;
 			}
 
-			std::cout << "hi~";
+			std::cout << "hi~" << std::endl;
 			std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
 			sort(key_vals.begin(), key_vals.end());
 
@@ -71,11 +74,11 @@ class Worker final: public masterworker::WorkerService::Service {
 					"Error when opening an output file for map function: " + output_filepath);
 			}
 
-			std::cout << "hey~";
+			std::cout << "hey~" << std::endl;
 			std::vector<std::pair<std::string, std::string> >::iterator it;
 			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
 
-			std::cout << "hello~";
+			std::cout << "hello~" << std::endl;
 			res->set_worker_ipaddr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 			return grpc::Status::OK;
