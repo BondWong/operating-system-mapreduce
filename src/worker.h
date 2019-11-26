@@ -76,8 +76,8 @@ class Worker final: public masterworker::WorkerService::Service {
 			res->set_worker_ipaddr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 
-			std::cout << "Worker: " << ip_addr_port << "done working on shard: " << shard->id() << std::endl;
-			std::cout << "Worker: " << ip_addr_port << "output file: " << output_filepath << std::endl;
+			std::cout << "Worker-map: " << ip_addr_port << " done working on shard: " << shard->id() << std::endl;
+			std::cout << "Worker-map: " << ip_addr_port << " output file: " << output_filepath << std::endl;
 
 			return grpc::Status::OK;
 		}
@@ -137,8 +137,8 @@ class Worker final: public masterworker::WorkerService::Service {
 			res->set_worker_ipaddr_port(ip_addr_port);
 			res->set_file_path(output_filepath);
 
-			std::cout << "Worker: " << ip_addr_port << "done working on region: " << region->id() << std::endl;
-			std::cout << "Worker: " << ip_addr_port << "output file: " << output_filepath << std::endl;
+			std::cout << "Worker-reduce: " << ip_addr_port << " done working on region: " << region->id() << std::endl;
+			std::cout << "Worker-reduce: " << ip_addr_port << " output file: " << output_filepath << std::endl;
 
 			return grpc::Status::OK;
 		}
