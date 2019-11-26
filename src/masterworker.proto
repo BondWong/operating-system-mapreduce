@@ -3,7 +3,6 @@ syntax = "proto3";
 package masterworker;
 
 service WorkerService {
-  rpc HelloWorld() returns (Result) {}
   rpc Map(Shard) returns (Result) {}
   rpc Reduce(Region) returns (Result) {}
 }

@@ -31,61 +31,61 @@ class Worker final: public masterworker::WorkerService::Service {
 		int map_number;
 		std::string ip_addr_port;
 
-		grpc::Status HelloWorld(masterworker::Result* res) override {
+		grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
 			res->file_path = "hi~";
 			std::cout << "I am worker " << ip_addr_port << std::endl;
 			return grpc::Status::OK;
 		}
 
-		grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
-			auto mapper = get_mapper_from_task_factory("cs6210");
-
-			for (int i = 0; i < shard->components_size(); i++) {
-				const masterworker::ShardComponent& comp = shard->components(i);
-				const std::string& file_path = comp.file_path();
-				int start = comp.start();
-				int size = comp.size();
-
-				std::cout << "Worker " << ip_addr_port << ": file_path"
-					<< file_path << "-start" << start << "-size" << size << std::endl;
-
-				std::ifstream source_file(file_path);
-				if (!source_file.is_open()) {
-					std::cerr << "Error when opening file: " << file_path << std::endl;
-					return grpc::Status(grpc::StatusCode::INTERNAL,
-						"Error when opening file: " + file_path);
-				}
-
-				std::string line;
-				// loop to the starting line
-				for (int j = 0; j < start; j++) std::getline(source_file, line);
-				for (int j = start; j < size; j++) {
-					std::getline(source_file, line);
-					mapper->map(line);
-				}
-			}
-
-			std::cout << "hi~";
-			std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
-			sort(key_vals.begin(), key_vals.end());
-
-			std::string output_filepath("Worker_" + ip_addr_port + "_" + std::to_string(++map_number));
-			std::ofstream output_file(output_filepath);
-			if (!output_file.is_open()) {
-				std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
-				return grpc::Status(grpc::StatusCode::INTERNAL,
-					"Error when opening an output file for map function: " + output_filepath);
-			}
-
-			std::cout << "hey~";
-			std::vector<std::pair<std::string, std::string> >::iterator it;
-			for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
-
-			std::cout << "hello~";
-			res->set_worker_ip_addr_port(ip_addr_port);
-			res->set_file_path(output_filepath);
-			return grpc::Status::OK;
-		}
+		// grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
+		// 	auto mapper = get_mapper_from_task_factory("cs6210");
+		//
+		// 	for (int i = 0; i < shard->components_size(); i++) {
+		// 		const masterworker::ShardComponent& comp = shard->components(i);
+		// 		const std::string& file_path = comp.file_path();
+		// 		int start = comp.start();
+		// 		int size = comp.size();
+		//
+		// 		std::cout << "Worker " << ip_addr_port << ": file_path"
+		// 			<< file_path << "-start" << start << "-size" << size << std::endl;
+		//
+		// 		std::ifstream source_file(file_path);
+		// 		if (!source_file.is_open()) {
+		// 			std::cerr << "Error when opening file: " << file_path << std::endl;
+		// 			return grpc::Status(grpc::StatusCode::INTERNAL,
+		// 				"Error when opening file: " + file_path);
+		// 		}
+		//
+		// 		std::string line;
+		// 		// loop to the starting line
+		// 		for (int j = 0; j < start; j++) std::getline(source_file, line);
+		// 		for (int j = start; j < size; j++) {
+		// 			std::getline(source_file, line);
+		// 			mapper->map(line);
+		// 		}
+		// 	}
+		//
+		// 	std::cout << "hi~";
+		// 	std::vector<std::pair<std::string, std::string> >& key_vals = mapper->impl_->pairs;
+		// 	sort(key_vals.begin(), key_vals.end());
+		//
+		// 	std::string output_filepath("Worker_" + ip_addr_port + "_" + std::to_string(++map_number));
+		// 	std::ofstream output_file(output_filepath);
+		// 	if (!output_file.is_open()) {
+		// 		std::cerr << "Error when opening an output file for map function: " << output_filepath << std::endl;
+		// 		return grpc::Status(grpc::StatusCode::INTERNAL,
+		// 			"Error when opening an output file for map function: " + output_filepath);
+		// 	}
+		//
+		// 	std::cout << "hey~";
+		// 	std::vector<std::pair<std::string, std::string> >::iterator it;
+		// 	for(it = key_vals.begin(); it != key_vals.end(); it++) output_file << it->first << " " << it->second << std::endl;
+		//
+		// 	std::cout << "hello~";
+		// 	res->set_worker_ip_addr_port(ip_addr_port);
+		// 	res->set_file_path(output_filepath);
+		// 	return grpc::Status::OK;
+		// }
 
 		grpc::Status Reduce(grpc::ServerContext* ctx, const masterworker::Region* region, masterworker::Result* res) override {
 			std::cout << "I am worker " << ip_addr_port << std::endl;

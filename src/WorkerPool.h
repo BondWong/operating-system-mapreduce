@@ -41,12 +41,20 @@ WorkerPool::WorkerPool(const std::vector<std::string>& worker_ipaddr_ports) {
 }
 
 std::thread WorkerPool::executeMap(const masterworker::Shard& shard, masterworker::Result* res) {
+	std::string worker = get_worker();
+	std::unique_ptr<masterworker::WorkerService::Stub>& stub_ = workers.at(worker);
+	grpc::ClientContext context;
+	grpc::Status status = stub_->Map(&context, shard, res);
+	std::cout << "making map call to worker: " << worker << std::endl;
+	if (!status.ok()) std::cerr << status.error_message() << std::endl;
+	std::cout << "done map call to worker with res: " << res->file_path() << std::endl;
+	release_worker(worker);
+	
 	std::function<void()> job = [&]() {
 		std::string worker = get_worker();
 		std::unique_ptr<masterworker::WorkerService::Stub>& stub_ = workers.at(worker);
 		grpc::ClientContext context;
-		// grpc::Status status = stub_->Map(&context, shard, res);
-		grpc::Status status = stub_->HelloWorld();
+		grpc::Status status = stub_->Map(&context, shard, res);
 		std::cout << "making map call to worker: " << worker << std::endl;
 		if (!status.ok()) std::cerr << status.error_message() << std::endl;
 		std::cout << "done map call to worker with res: " << res->file_path() << std::endl;
