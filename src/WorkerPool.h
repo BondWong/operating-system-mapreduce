@@ -16,8 +16,7 @@
 
 class WorkerPool {
 public:
-	WorkerPool(std::vector<std::string>& worker_ipaddr_ports);
-	~WorkerPool();
+	WorkerPool(const std::vector<std::string>& worker_ipaddr_ports);
 	void executeMap();
 	void executeReduce();
 
@@ -58,7 +57,7 @@ std::thread WorkerPool::executeMap(const masterworker::Shard* shard, masterworke
 	return t;
 }
 
-std::sthread WorkerPool::executeReduce(const masterworker::Region* region, masterworker::Result* res) {
+std::thread WorkerPool::executeReduce(const masterworker::Region* region, masterworker::Result* res) {
 	std::function<void()> job = [&]() {
 		std::string worker = get_worker();
 		std::unique_ptr<WorkerService::Stub>& stub_ = workers.at(workder_ipaddr_port);
