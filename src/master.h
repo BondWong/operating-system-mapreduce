@@ -76,13 +76,11 @@ void Master::asyncCompleteRpcMap() {
 			std::cout << call->status.error_code() << ": " << call->status.error_message() << std::endl;
 			return;
 		}
-		std::string worker = call->res.worker_ipaddr_port();
-		workerPool->release_worker(worker);
 		std::unique_lock<std::mutex> lock(mutex);
-		std::cout << "async rep" << std::endl;
-		std::cout << call->res.file_path() + " " + call->res.worker_ipaddr_port() << std::endl;
 		mapResults.push_back(call->res);
 		lock.unlock();
+		std::string worker = call->res.worker_ipaddr_port();
+		workerPool->release_worker(worker);
 		delete call;
 	}
 }
