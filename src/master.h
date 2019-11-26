@@ -47,7 +47,7 @@ bool Master::run() {
 	for (it = file_shards.begin(); it != file_shards.end(); it++) {
 		masterworker::Shard shard;
 		shard.set_id(it->id);
-		std::vector<masterworker::ShardComponent>::const_iterator component_it;
+		std::vector<ShardComponent>::const_iterator component_it;
 		for (component_it = it->components.begin(); component_it != it->components.end(); component_it++) {
 			masterworker::ShardComponent *component = shard.add_components();
 			component->set_file_path(component_it->file_path());
@@ -73,7 +73,7 @@ bool Master::run() {
 		masterworker::Region region;
 		region.set_id(region_id++);
 		while (j < results.size() && j < region_size) {
-			region.add_file_paths(results.at(i).file_path);
+			region.add_file_paths(results.at(i).file_path());
 			j++;
 		}
 
