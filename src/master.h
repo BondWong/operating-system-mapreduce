@@ -130,7 +130,6 @@ bool Master::run() {
 
 	// block till all map jobs finished
 	while (!workerPool->done()) std::this_thread::sleep_for(std::chrono::seconds(1));
-	std::this_thread::sleep_for(std::chrono::seconds(10));
 	while (mapFiles.size() != file_shards.size()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		std::cout << mapFiles.size() << std::endl;
@@ -143,6 +142,8 @@ bool Master::run() {
 		std::ifstream interm_file(file_path);
 		total_line_cnt += std::count(std::istreambuf_iterator<char>(interm_file), std::istreambuf_iterator<char>(), '\n');
 	}
+
+	std::cout << "total line: " << total_line_cnt << std::endl;
 
 	// do reduce works with blocking queue, thread pool idea from my last assignment
 	int region_id = 0;
@@ -194,7 +195,8 @@ bool Master::run() {
 
 		if (cur_size > 0) {
 			std::cout << "Found a region of size: " << cur_size << std::endl;
-			masterworker::Shard& region = regions.back();
+			masterworker::Shard region;
+			if (regions.back()) region = regions.back();
 			masterworker::ShardComponent *component = region.add_components();
 			component->set_file_path(file_path);
 			component->set_start(start_line);
