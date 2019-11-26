@@ -31,8 +31,12 @@ class Worker final: public masterworker::WorkerService::Service {
 		int map_number;
 		std::string ip_addr_port;
 
-		grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
+		grpc::Status HelloWorld() override {
 			std::cout << "I am worker " << ip_addr_port << std::endl;
+			return grpc::Status::OK;
+		}
+
+		grpc::Status Map(grpc::ServerContext* ctx, const masterworker::Shard* shard, masterworker::Result* res) override {
 			auto mapper = get_mapper_from_task_factory("cs6210");
 
 			for (int i = 0; i < shard->components_size(); i++) {
